@@ -15,12 +15,14 @@ concurrency:
 
 jobs:
   checks:
-    name: Lint, types, and build
+    name: Format, lint, types, and build
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       NEXT_TELEMETRY_DISABLED: "1"
       TURBO_TELEMETRY_DISABLED: "1"
+      DATABASE_URL: postgresql://townhawll:townhawll_dev@localhost:5433/townhawll
+      REDIS_URL: redis://localhost:6379
 
     steps:
       - name: Check out repository
@@ -39,11 +41,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check formatting
+        run: pnpm run format:check
+
       - name: Lint
         run: pnpm run lint
 
       - name: Check types
-        run: pnpm run check-types
+        run: pnpm run typecheck
 
       - name: Build
         run: pnpm run build

@@ -1,39 +1,32 @@
-import { globalIgnores } from "eslint/config";
-import pluginReactHooks from "eslint-plugin-react-hooks";
+import next from "@next/eslint-plugin-next";
+import reactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
-import pluginNext from "@next/eslint-plugin-next";
-import { config as baseConfig } from "./base.js";
 
-/**
- * A custom ESLint configuration for libraries that use Next.js.
- *
- * @type {import("eslint").Linter.Config[]}
- * */
-export const nextJsConfig = [
+import { baseConfig } from "./base.js";
+
+/** @type {import("eslint").Linter.Config[]} */
+export const nextConfig = [
   ...baseConfig,
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
   {
+    files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
       globals: {
         ...globals.browser,
         ...globals.serviceworker,
       },
     },
-  },
-  {
     plugins: {
-      "@next/next": pluginNext,
+      "@next/next": next,
     },
     rules: {
-      ...pluginNext.configs.recommended.rules,
-      ...pluginNext.configs["core-web-vitals"].rules,
+      ...next.configs.recommended.rules,
+      ...next.configs["core-web-vitals"].rules,
+    },
+    settings: {
+      next: {
+        rootDir: ".",
+      },
     },
   },
-  pluginReactHooks.configs.flat.recommended,
+  reactHooks.configs.flat.recommended,
 ];

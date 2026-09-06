@@ -1,9 +1,13 @@
 {
-  "name": "@repo/typescript-config",
+  "name": "@townhawll/typescript-config",
   "version": "0.0.0",
   "private": true,
-  "license": "MIT",
+  "license": "UNLICENSED",
+  "files": [
+    "base.json",
+    "nextjs.json"
+  ],
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   }
 }

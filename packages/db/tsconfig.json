@@ -1,0 +1,10 @@
+{
+  "extends": "@townhawll/typescript-config/base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": ["generated/**/*.ts", "prisma.config.ts", "src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

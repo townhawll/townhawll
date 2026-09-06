@@ -36,3 +36,7 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+.cache
+*.tsbuildinfo
+next-env.d.ts
+packages/db/generated/

@@ -1,26 +1,23 @@
 {
-  "name": "@townhawll/web",
+  "name": "@townhawll/config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "license": "UNLICENSED",
   "scripts": {
-    "build": "next build",
-    "dev": "next dev --port 3000",
     "lint": "eslint .",
-    "start": "next start --port 3000",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./server-env": "./src/server-env.ts"
   },
   "dependencies": {
-    "next": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@townhawll/eslint-config": "workspace:*",
     "@townhawll/typescript-config": "workspace:*",
     "@types/node": "catalog:",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:"
   }

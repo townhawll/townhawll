@@ -1,3 +1,7 @@
-# `@turbo/eslint-config`
+# @townhawll/eslint-config
 
-Collection of internal eslint configurations.
+Shared flat ESLint configurations for TownHawll.
+
+- @townhawll/eslint-config/base provides strict TypeScript-aware repository
+  rules.
+- @townhawll/eslint-config/next adds Next.js and React Hooks rules.
