@@ -1,13 +1,13 @@
 {
-  "name": "@townhawll/web",
+  "name": "@townhawll/admin",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "next build",
-    "dev": "next dev --port 3000",
+    "dev": "next dev --port 3001",
     "lint": "eslint .",
-    "start": "next start --port 3000",
+    "start": "next start --port 3001",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {

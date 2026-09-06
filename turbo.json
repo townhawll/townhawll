@@ -1,17 +1,31 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
+  "globalEnv": ["DATABASE_URL"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
-    "lint": {
-      "dependsOn": ["^lint"]
+    "generate": {
+      "outputs": ["generated/**"]
     },
-    "check-types": {
-      "dependsOn": ["^check-types"]
+    "lint": {
+      "dependsOn": ["^lint"],
+      "outputs": []
+    },
+    "@townhawll/db#lint": {
+      "dependsOn": ["^lint", "generate"],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "@townhawll/db#typecheck": {
+      "dependsOn": ["^typecheck", "generate"],
+      "outputs": []
     },
     "dev": {
       "cache": false,

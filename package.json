@@ -5,16 +5,25 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "infra:up": "docker compose up -d --wait",
+    "infra:down": "docker compose down",
+    "infra:reset": "docker compose down --volumes --remove-orphans",
+    "db:generate": "pnpm --filter @townhawll/db generate",
+    "db:migrate": "pnpm --filter @townhawll/db db:migrate",
+    "db:reset": "pnpm --filter @townhawll/db db:reset",
+    "db:studio": "pnpm --filter @townhawll/db db:studio",
+    "db:smoke": "pnpm --filter @townhawll/db db:smoke"
   },
   "devDependencies": {
-    "prettier": "3.9.6",
-    "turbo": "^2.10.12",
-    "typescript": "7.0.2"
+    "prettier": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:"
   },
   "packageManager": "pnpm@11.25.0",
   "engines": {
-    "node": ">=24"
+    "node": ">=24.11.0"
   }
 }

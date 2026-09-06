@@ -378,9 +378,3 @@ Then summarize:
 - Ask when a genuine product/architecture decision is missing.
 - Do not treat old TownHawll research as current implementation guidance.
 - If current repo docs conflict with older plans, follow the newer approved decision and flag the conflict.
-
-## Source of Truth
-
-The current repository and approved TownHawll documentation are the source of truth.
-
-Keep this root file high-signal. Put detailed feature-specific rules in `docs/` or future scoped agent files instead of continuously expanding `AGENTS.md`.

@@ -1,0 +1,2 @@
+-- Establish the Prisma migration history without introducing domain tables.
+-- Product models will be added in their owning MVP build steps.

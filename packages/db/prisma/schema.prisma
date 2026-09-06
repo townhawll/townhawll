@@ -1,0 +1,13 @@
+// TownHawll domain models are introduced with the MVP features that own them.
+// This model-free schema verifies the Prisma and migration toolchain without
+// prematurely defining catalogue, identity, or community data.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
