@@ -11,17 +11,20 @@
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@townhawll/ui": "workspace:*",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "catalog:",
     "@townhawll/eslint-config": "workspace:*",
     "@townhawll/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "eslint": "catalog:",
+    "postcss": "catalog:",
     "typescript": "catalog:"
   }
 }
