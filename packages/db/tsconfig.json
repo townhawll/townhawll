@@ -1,6 +1,7 @@
 {
   "extends": "@townhawll/typescript-config/base.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "lib": ["ES2023"],
     "rootDir": ".",
     "types": ["node"]

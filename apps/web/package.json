@@ -11,6 +11,8 @@
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@townhawll/auth": "workspace:*",
+    "@townhawll/email": "workspace:*",
     "@townhawll/ui": "workspace:*",
     "next": "catalog:",
     "react": "catalog:",

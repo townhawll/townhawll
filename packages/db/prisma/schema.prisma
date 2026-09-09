@@ -1,13 +1,96 @@
-// TownHawll domain models are introduced with the MVP features that own them.
-// This model-free schema verifies the Prisma and migration toolchain without
-// prematurely defining catalogue, identity, or community data.
-
 generator client {
   provider     = "prisma-client"
   output       = "../generated/prisma"
   moduleFormat = "esm"
+  importFileExtension = "ts"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum AccountStatus {
+  ACTIVE
+  RESTRICTED
+  SUSPENDED
+  BANNED
+  DELETED
+}
+
+model User {
+  id            String               @id @default(cuid())
+  email         String               @unique @db.Citext
+  username      String?              @unique @db.Citext
+  passwordHash  String?              @map("password_hash") @db.Text
+  emailVerified DateTime?            @map("email_verified")
+  name          String?
+  image         String?
+  status        AccountStatus        @default(ACTIVE)
+  createdAt     DateTime             @default(now()) @map("created_at")
+  updatedAt     DateTime             @updatedAt @map("updated_at")
+  accounts      Account[]
+  sessions      Session[]
+  resetTokens   PasswordResetToken[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String   @map("provider_account_id")
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String   @db.Citext
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([identifier, token])
+  @@index([expires])
+  @@map("verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
 }
