@@ -1,7 +1,7 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { loadDbEnvironment } from "@townhawll/config/server-env";
 
-import { PrismaClient } from "../generated/prisma/client.js";
+import { PrismaClient } from "../generated/prisma/client.ts";
 
 const environment = loadDbEnvironment();
 const adapter = new PrismaPg({
@@ -19,4 +19,5 @@ if (environment.NODE_ENV !== "production") {
   globalForDb.townhawllDb = db;
 }
 
-export type { Prisma } from "../generated/prisma/client.js";
+export { AccountStatus } from "../generated/prisma/client.ts";
+export type { Prisma } from "../generated/prisma/client.ts";

@@ -1,0 +1,25 @@
+{
+  "name": "@townhawll/cache",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@townhawll/config": "workspace:*",
+    "redis": "catalog:"
+  },
+  "devDependencies": {
+    "@townhawll/eslint-config": "workspace:*",
+    "@townhawll/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  }
+}
