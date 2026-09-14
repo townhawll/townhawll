@@ -6,6 +6,11 @@ import {
   signupSchema,
 } from "@townhawll/auth/signup";
 import { getApplicationUrl, sendVerificationEmail } from "@townhawll/email";
+import {
+  createLogger,
+  getOrCreateRequestId,
+  withRequestId,
+} from "@townhawll/observability";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -15,6 +20,8 @@ export interface SignupActionState {
   error?: string;
   fields?: { email?: string[]; password?: string[]; username?: string[] };
 }
+
+const logger = createLogger("web");
 
 export async function signupAction(
   _previousState: SignupActionState,
@@ -29,9 +36,15 @@ export async function signupAction(
 
   if (!parsed.success) return { fields: parsed.error.flatten().fieldErrors };
 
+  const requestHeaders = await headers();
+  const requestLogger = withRequestId(
+    logger,
+    getOrCreateRequestId(requestHeaders),
+  );
+
   try {
     const allowed = await allowSignup({
-      ipAddress: getClientIp(await headers()),
+      ipAddress: getClientIp(requestHeaders),
       email: parsed.data.email,
     });
     if (!allowed)
@@ -52,12 +65,14 @@ export async function signupAction(
           verificationUrl: verificationUrl.toString(),
           idempotencyKey: `email-verification/${registration.tokenHash}`,
         });
-      } catch {
+      } catch (error) {
         // The durable token remains available for a safe resend attempt.
+        requestLogger.warn({ err: error, event: "verification_email_failure" });
         deliveryFailed = true;
       }
     }
-  } catch {
+  } catch (error) {
+    requestLogger.error({ err: error, event: "auth_signup_failure" });
     return {
       error: "We could not create your account right now. Please try again.",
     };

@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+import {
+  parseAdminSentryDsn,
+  parseWebSentryDsn,
+} from "@townhawll/config/public-env";
+
 const runtimeEnvironmentSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -48,6 +53,10 @@ const emailEnvironmentSchema = z.object({
     ),
   EMAIL_FROM: z.string().trim().min(1, "EMAIL_FROM is required."),
   RESEND_API_KEY: z.string().trim().min(1, "RESEND_API_KEY is required."),
+});
+
+const observabilityEnvironmentSchema = runtimeEnvironmentSchema.extend({
+  LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 });
 
 const serverEnvironmentSchema = dbEnvironmentSchema.extend(
@@ -118,8 +127,39 @@ export function loadServerEnvironment(
   return result.data;
 }
 
+export function loadObservabilityEnvironment(
+  environment: NodeJS.ProcessEnv = process.env,
+) {
+  const result = observabilityEnvironmentSchema.safeParse(environment);
+
+  if (!result.success) {
+    throw invalidEnvironment(result.error);
+  }
+
+  return result.data;
+}
+
+export function loadWebSentryEnvironment(
+  environment: NodeJS.ProcessEnv = process.env,
+) {
+  return {
+    sentryDsn: parseWebSentryDsn(environment.NEXT_PUBLIC_SENTRY_DSN_WEB),
+  };
+}
+
+export function loadAdminSentryEnvironment(
+  environment: NodeJS.ProcessEnv = process.env,
+) {
+  return {
+    sentryDsn: parseAdminSentryDsn(environment.NEXT_PUBLIC_SENTRY_DSN_ADMIN),
+  };
+}
+
 export type DbEnvironment = z.infer<typeof dbEnvironmentSchema>;
 export type RedisEnvironment = z.infer<typeof redisEnvironmentSchema>;
 export type AuthEnvironment = z.infer<typeof authEnvironmentSchema>;
 export type EmailEnvironment = z.infer<typeof emailEnvironmentSchema>;
 export type ServerEnvironment = z.infer<typeof serverEnvironmentSchema>;
+export type ObservabilityEnvironment = ReturnType<
+  typeof loadObservabilityEnvironment
+>;

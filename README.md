@@ -9,27 +9,13 @@ foundations. Product features are added only when their MVP step needs them.
 ## Prerequisites
 
 - Node.js 24.11 or newer
-- pnpm 11.25.0 through Corepack
+- pnpm 11.25.0
 - Docker Desktop or Docker Engine with Compose
-
-## Workspace
-
-- apps/web: public and authenticated user-facing Next.js app on port 3000
-- apps/admin: staff and operations Next.js app on port 3001
-- packages/config: shared server environment validation
-- packages/db: Prisma client, schema, and migrations
-- packages/typescript-config: shared strict TypeScript configuration
-- packages/eslint-config: shared type-aware ESLint configuration
-
-See [docs/engineering/architecture.md](docs/engineering/architecture.md) for the
-current system boundaries and implementation rules.
 
 ## Local development
 
 Install dependencies and create the local environment file:
 
-    corepack enable
-    corepack install
     pnpm install
     Copy-Item .env.example .env
 

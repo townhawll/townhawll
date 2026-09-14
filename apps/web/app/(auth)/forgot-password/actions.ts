@@ -6,6 +6,11 @@ import {
   forgotPasswordSchema,
 } from "@townhawll/auth/password-reset";
 import { getApplicationUrl, sendPasswordResetEmail } from "@townhawll/email";
+import {
+  createLogger,
+  getOrCreateRequestId,
+  withRequestId,
+} from "@townhawll/observability";
 import { headers } from "next/headers";
 
 import { getClientIp } from "../_lib/client-ip";
@@ -17,6 +22,7 @@ export interface ForgotPasswordActionState {
 
 const GENERIC_RESPONSE =
   "If an account exists for that email, a password reset link will arrive shortly.";
+const logger = createLogger("web");
 
 export async function forgotPasswordAction(
   _previousState: ForgotPasswordActionState,
@@ -29,10 +35,16 @@ export async function forgotPasswordAction(
     return { fields: parsed.error.flatten().fieldErrors };
   }
 
+  const requestHeaders = await headers();
+  const requestLogger = withRequestId(
+    logger,
+    getOrCreateRequestId(requestHeaders),
+  );
+
   try {
     const allowed = await allowPasswordResetRequest({
       email: parsed.data.email,
-      ipAddress: getClientIp(await headers()),
+      ipAddress: getClientIp(requestHeaders),
     });
 
     if (allowed) {
@@ -47,8 +59,9 @@ export async function forgotPasswordAction(
         });
       }
     }
-  } catch {
+  } catch (error) {
     // Account, rate-limit, and provider state must remain private.
+    requestLogger.warn({ err: error, event: "password_reset_request_failure" });
   }
 
   return { message: GENERIC_RESPONSE };

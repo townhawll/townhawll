@@ -1,25 +1,31 @@
 {
-  "name": "@townhawll/config",
+  "name": "@townhawll/observability",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "license": "UNLICENSED",
   "scripts": {
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test src/*.test.ts"
   },
   "exports": {
-    "./server-env": "./src/server-env.ts",
-    "./public-env": "./src/public-env.ts"
+    ".": "./src/index.ts",
+    "./context": "./src/context.ts",
+    "./logger": "./src/logger.ts",
+    "./redact": "./src/redact.ts",
+    "./sentry": "./src/sentry.ts"
   },
   "dependencies": {
-    "zod": "catalog:"
+    "@townhawll/config": "workspace:*",
+    "pino": "catalog:"
   },
   "devDependencies": {
     "@townhawll/eslint-config": "workspace:*",
     "@townhawll/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:"
   }
 }
