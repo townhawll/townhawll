@@ -28,6 +28,7 @@
     "@townhawll/config": "workspace:*",
     "@townhawll/cache": "workspace:*",
     "@townhawll/db": "workspace:*",
+    "@townhawll/profile": "workspace:*",
     "next-auth": "catalog:",
     "zod": "catalog:"
   },

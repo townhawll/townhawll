@@ -1,3 +1,5 @@
+import { normalizeUsername } from "@townhawll/profile";
+
 function normalizeIdentifier(value: string): string {
   return value.trim().normalize("NFKC").toLowerCase();
 }
@@ -6,9 +8,7 @@ export function normalizeEmail(email: string): string {
   return normalizeIdentifier(email);
 }
 
-export function normalizeUsername(username: string): string {
-  return normalizeIdentifier(username);
-}
+export { normalizeUsername };
 
 export async function findUserByEmail(email: string) {
   const { db } = await import("@townhawll/db");
@@ -21,8 +21,8 @@ export async function findUserByEmail(email: string) {
 export async function findUserByUsername(username: string) {
   const { db } = await import("@townhawll/db");
 
-  return db.user.findUnique({
-    where: { username: normalizeUsername(username) },
+  return db.user.findFirst({
+    where: { profile: { is: { username: normalizeUsername(username) } } },
   });
 }
 
@@ -30,9 +30,17 @@ export async function findUserByIdentifier(identifier: string) {
   const { db } = await import("@townhawll/db");
   const normalizedIdentifier = normalizeIdentifier(identifier);
 
-  return db.user.findFirst({
+  const user = await db.user.findFirst({
     where: {
-      OR: [{ email: normalizedIdentifier }, { username: normalizedIdentifier }],
+      OR: [
+        { email: normalizedIdentifier },
+        { profile: { is: { username: normalizedIdentifier } } },
+      ],
     },
+    include: { profile: { select: { username: true } } },
   });
+
+  return user === null
+    ? null
+    : { ...user, username: user.profile?.username ?? null };
 }

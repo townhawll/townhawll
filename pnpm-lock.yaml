@@ -274,6 +274,9 @@ importers:
       '@townhawll/db':
         specifier: workspace:*
         version: link:../db
+      '@townhawll/profile':
+        specifier: workspace:*
+        version: link:../profile
       next-auth:
         specifier: 'catalog:'
         version: 5.0.0-beta.32(next@16.3.4(@babel/core@8.0.1)(@opentelemetry/api@1.9.1)(@types/node@26.4.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
@@ -453,6 +456,31 @@ importers:
       pino:
         specifier: 'catalog:'
         version: 10.3.1
+    devDependencies:
+      '@townhawll/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@townhawll/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.4.1
+      eslint:
+        specifier: 'catalog:'
+        version: 10.9.1(jiti@2.7.0)(supports-color@8.1.1)
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.13
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
+  packages/profile:
+    dependencies:
+      zod:
+        specifier: 'catalog:'
+        version: 4.5.4
     devDependencies:
       '@townhawll/eslint-config':
         specifier: workspace:*
@@ -6347,7 +6375,7 @@ snapshots:
 
   webpack@5.110.3(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.28)(sharp@0.35.4(@types/node@26.4.1)):
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       '@types/json-schema': 7.0.15
       '@webassemblyjs/ast': 1.14.1
       '@webassemblyjs/wasm-edit': 1.14.1

@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { loadAuthEnvironment } from "@townhawll/config/server-env";
 import NextAuth, { type NextAuthConfig } from "next-auth";
+import type { Adapter } from "next-auth/adapters";
 import Google from "next-auth/providers/google";
 
 import {
@@ -77,7 +78,19 @@ export async function createAuthConfig(): Promise<NextAuthConfig> {
   const { db } = await import("@townhawll/db");
 
   return {
-    adapter: createGoogleAuthAdapter(PrismaAdapter(db)),
+    adapter: createGoogleAuthAdapter({
+      ...PrismaAdapter(db),
+      createUser: (user) =>
+        db.user.create({
+          data: {
+            email: user.email,
+            emailVerified: user.emailVerified,
+            name: user.name ?? null,
+            image: user.image ?? null,
+            profile: { create: { displayName: user.name ?? null } },
+          },
+        }),
+    } satisfies Adapter),
     cookies: {
       sessionToken: {
         name: getAuthSessionCookieName(),
@@ -94,9 +107,13 @@ export async function createAuthConfig(): Promise<NextAuthConfig> {
         });
         return decision.allowed;
       },
-      session({ session, user }) {
+      async session({ session, user }) {
         session.user.id = user.id;
-        session.user.username = user.username;
+        const profile = await db.profile.findUnique({
+          where: { userId: user.id },
+          select: { username: true },
+        });
+        session.user.username = profile?.username ?? null;
         session.user.emailVerified = user.emailVerified;
         session.user.status = user.status;
 

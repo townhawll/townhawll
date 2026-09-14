@@ -19,5 +19,5 @@ if (environment.NODE_ENV !== "production") {
   globalForDb.townhawllDb = db;
 }
 
-export { AccountStatus } from "../generated/prisma/client.ts";
+export { AccountStatus, ContentFocus } from "../generated/prisma/client.ts";
 export type { Prisma } from "../generated/prisma/client.ts";
