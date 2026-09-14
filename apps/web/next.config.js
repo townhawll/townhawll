@@ -7,6 +7,7 @@ const nextConfig = {
     "@townhawll/config",
     "@townhawll/db",
     "@townhawll/email",
+    "@townhawll/observability",
     "@townhawll/ui",
   ],
 };

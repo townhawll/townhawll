@@ -7,6 +7,11 @@ import {
 } from "@townhawll/auth/login";
 import { getSafeCallbackUrl } from "@townhawll/auth/redirects";
 import {
+  createLogger,
+  getOrCreateRequestId,
+  withRequestId,
+} from "@townhawll/observability";
+import {
   createDatabaseSession,
   getAuthSessionCookieName,
   getAuthSessionCookieOptions,
@@ -23,6 +28,7 @@ export interface LoginActionState {
 
 const INVALID_CREDENTIALS_MESSAGE =
   "The username, email, or password you entered is incorrect.";
+const logger = createLogger("web");
 
 export async function loginAction(
   _previousState: LoginActionState,
@@ -41,10 +47,16 @@ export async function loginAction(
   );
   let requiresVerification = false;
 
+  const requestHeaders = await headers();
+  const requestLogger = withRequestId(
+    logger,
+    getOrCreateRequestId(requestHeaders),
+  );
+
   try {
     const allowed = await allowLogin({
       identifier: parsed.data.identifier,
-      ipAddress: getClientIp(await headers()),
+      ipAddress: getClientIp(requestHeaders),
     });
 
     if (!allowed) {
@@ -68,7 +80,8 @@ export async function loginAction(
         expires: session.expires,
       });
     }
-  } catch {
+  } catch (error) {
+    requestLogger.error({ err: error, event: "auth_login_failure" });
     return {
       error: "We could not sign you in right now. Please try again.",
     };

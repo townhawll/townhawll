@@ -8,6 +8,7 @@
     "AUTH_SECRET",
     "DATABASE_URL",
     "EMAIL_FROM",
+    "LOG_LEVEL",
     "NODE_ENV",
     "REDIS_URL",
     "RESEND_API_KEY"
@@ -20,6 +21,13 @@
     },
     "@townhawll/web#build": {
       "dependsOn": ["^build", "@townhawll/db#generate"],
+      "env": ["NEXT_PUBLIC_SENTRY_DSN_WEB"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+    },
+    "@townhawll/admin#build": {
+      "dependsOn": ["^build"],
+      "env": ["NEXT_PUBLIC_SENTRY_DSN_ADMIN"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
@@ -48,6 +56,16 @@
     },
     "dev": {
       "cache": false,
+      "persistent": true
+    },
+    "@townhawll/web#dev": {
+      "cache": false,
+      "env": ["NEXT_PUBLIC_SENTRY_DSN_WEB"],
+      "persistent": true
+    },
+    "@townhawll/admin#dev": {
+      "cache": false,
+      "env": ["NEXT_PUBLIC_SENTRY_DSN_ADMIN"],
       "persistent": true
     }
   }
