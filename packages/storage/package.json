@@ -1,5 +1,5 @@
 {
-  "name": "@townhawll/profile",
+  "name": "@townhawll/storage",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,14 +11,11 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./onboarding": "./src/onboarding.ts",
-    "./avatar": "./src/avatar.ts",
-    "./repository": "./src/repository.ts"
+    "./validation": "./src/validation.ts"
   },
   "dependencies": {
-    "@townhawll/db": "workspace:*",
-    "@townhawll/storage": "workspace:*",
-    "zod": "catalog:"
+    "@aws-sdk/client-s3": "catalog:",
+    "@townhawll/config": "workspace:*"
   },
   "devDependencies": {
     "@townhawll/eslint-config": "workspace:*",

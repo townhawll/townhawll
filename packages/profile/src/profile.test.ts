@@ -23,6 +23,7 @@ void test("usernames reject unsafe, reserved, and out-of-range values", () => {
     "admin",
     "SIGNUP",
     "townhawll",
+    "onboarding",
   ]) {
     assert.equal(usernameSchema.safeParse(value).success, false, value);
   }

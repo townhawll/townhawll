@@ -11,6 +11,8 @@ import {
 } from "@townhawll/auth/session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getPostAuthDestination } from "@townhawll/auth/onboarding";
+import { getOnboardingCompletedAt } from "@townhawll/profile/repository";
 
 import { auth } from "../../auth";
 
@@ -63,6 +65,14 @@ export async function requireCurrentVerifiedUser(callbackUrl: string) {
 
     throw error;
   }
+}
+
+export async function requireCurrentOnboardedUser(callbackUrl: string) {
+  const user = await requireCurrentVerifiedUser(callbackUrl);
+  const completedAt = await getOnboardingCompletedAt(user.id);
+  const destination = getPostAuthDestination(completedAt, callbackUrl);
+  if (completedAt === null) redirect(destination);
+  return user;
 }
 
 async function clearCurrentSession() {

@@ -1,6 +1,8 @@
 import { getSafeCallbackUrl } from "@townhawll/auth/redirects";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getPostAuthDestination } from "@townhawll/auth/onboarding";
+import { getOnboardingCompletedAt } from "@townhawll/profile/repository";
 
 import { auth } from "../../../auth";
 import { GoogleAuthButton } from "../_components/google-auth-button";
@@ -29,7 +31,12 @@ export default async function LoginPage({
     session?.user.emailVerified &&
     (session.user.status === "ACTIVE" || session.user.status === "RESTRICTED")
   ) {
-    redirect(callbackUrl);
+    redirect(
+      getPostAuthDestination(
+        await getOnboardingCompletedAt(session.user.id),
+        callbackUrl,
+      ),
+    );
   }
 
   return (

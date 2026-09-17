@@ -13,9 +13,12 @@
   "dependencies": {
     "@sentry/nextjs": "catalog:",
     "@townhawll/auth": "workspace:*",
+    "@townhawll/cache": "workspace:*",
     "@townhawll/config": "workspace:*",
     "@townhawll/email": "workspace:*",
     "@townhawll/observability": "workspace:*",
+    "@townhawll/profile": "workspace:*",
+    "@townhawll/storage": "workspace:*",
     "@townhawll/ui": "workspace:*",
     "next": "catalog:",
     "react": "catalog:",

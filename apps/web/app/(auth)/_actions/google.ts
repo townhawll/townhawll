@@ -22,5 +22,8 @@ export async function googleSignInAction(formData: FormData) {
   }
 
   if (!allowed) redirect("/login?error=rate_limited");
-  await signIn("google", { redirectTo: callbackUrl });
+  // The account route checks onboarding before honoring the safe return URL.
+  const relay = new URL("https://townhawll.invalid/account");
+  relay.searchParams.set("callbackUrl", callbackUrl);
+  await signIn("google", { redirectTo: `${relay.pathname}${relay.search}` });
 }

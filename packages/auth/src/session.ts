@@ -87,7 +87,12 @@ export async function createAuthConfig(): Promise<NextAuthConfig> {
             emailVerified: user.emailVerified,
             name: user.name ?? null,
             image: user.image ?? null,
-            profile: { create: { displayName: user.name ?? null } },
+            profile: {
+              create: {
+                displayName: user.name ?? null,
+                avatarUrl: user.image ?? null,
+              },
+            },
           },
         }),
     } satisfies Adapter),
@@ -127,7 +132,7 @@ export async function createAuthConfig(): Promise<NextAuthConfig> {
         }
       },
     },
-    pages: { error: "/login", newUser: "/account", signIn: "/login" },
+    pages: { error: "/login", newUser: "/onboarding", signIn: "/login" },
     providers: [
       Google({
         allowDangerousEmailAccountLinking: true,

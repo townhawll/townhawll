@@ -42,16 +42,18 @@ enum ContentFocus {
 }
 
 model Profile {
-  userId                String        @id @map("user_id")
-  username              String?       @unique @db.Citext
-  displayName           String?       @map("display_name")
-  avatarUrl             String?       @map("avatar_url") @db.Text
-  bio                   String?       @db.VarChar(500)
-  contentFocus          ContentFocus? @map("content_focus")
-  onboardingCompletedAt DateTime?     @map("onboarding_completed_at")
-  createdAt             DateTime      @default(now()) @map("created_at")
-  updatedAt             DateTime      @updatedAt @map("updated_at")
-  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                   String        @id @map("user_id")
+  username                 String?       @unique @db.Citext
+  displayName              String?       @map("display_name")
+  avatarUrl                String?       @map("avatar_url") @db.Text
+  avatarObjectKey          String?       @map("avatar_object_key") @db.Text
+  bio                      String?       @db.VarChar(500)
+  contentFocus             ContentFocus? @map("content_focus")
+  onboardingProfileSavedAt DateTime?     @map("onboarding_profile_saved_at")
+  onboardingCompletedAt    DateTime?     @map("onboarding_completed_at")
+  createdAt                DateTime      @default(now()) @map("created_at")
+  updatedAt                DateTime      @updatedAt @map("updated_at")
+  user                     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
 }

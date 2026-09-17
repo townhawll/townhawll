@@ -9,6 +9,7 @@ const reservedUsernames = new Set([
   "help",
   "login",
   "logout",
+  "onboarding",
   "profile",
   "screen",
   "settings",
@@ -42,6 +43,20 @@ export const usernameSchema = z
 
 export const contentFocusSchema = z.enum(["GAMES", "SCREEN", "BOTH"]);
 
+export const onboardingProfileSchema = z.object({
+  username: usernameSchema,
+  displayName: z
+    .string()
+    .trim()
+    .min(1, "Enter a display name.")
+    .max(80, "Display name must contain at most 80 characters."),
+  bio: z.string().trim().max(500, "Bio must contain at most 500 characters."),
+});
+
+export const onboardingFocusSchema = z.object({
+  contentFocus: contentFocusSchema,
+});
+
 export const profileInputSchema = z.object({
   username: usernameSchema,
   displayName: z.string().trim().min(1).max(80),
@@ -55,3 +70,4 @@ export const profileInputSchema = z.object({
 
 export type ContentFocus = z.infer<typeof contentFocusSchema>;
 export type ProfileInput = z.infer<typeof profileInputSchema>;
+export type OnboardingProfileInput = z.infer<typeof onboardingProfileSchema>;

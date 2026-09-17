@@ -52,6 +52,19 @@ data and containers:
 Both reset commands are destructive and are intended only for local development.
 Prisma Studio is available with pnpm db:studio.
 
+## Object storage
+
+Development uses the local storage driver by default. Uploaded objects are kept
+under `.tmp/storage/` and the web app serves them from a development-only route.
+The directory is ignored by Git, so no Cloudflare account or storage credentials
+are needed to upload an avatar locally.
+
+Production must set `STORAGE_DRIVER=r2` and configure every `R2_*` variable
+shown in `.env.example`. `R2_PUBLIC_URL` is the public bucket or custom media
+origin. If the driver is omitted during development, complete R2 configuration
+selects R2; otherwise TownHawll selects local storage. Partial R2 configuration
+fails validation rather than silently using a different driver.
+
 ## Checks
 
     pnpm lint

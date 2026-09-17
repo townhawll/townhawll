@@ -1,13 +1,25 @@
 import { Button } from "@townhawll/ui";
 import type { Metadata } from "next";
+import { getSafeCallbackUrl } from "@townhawll/auth/redirects";
+import { redirect } from "next/navigation";
 
-import { requireCurrentVerifiedUser } from "../../_lib/current-user";
+import { requireCurrentOnboardedUser } from "../../_lib/current-user";
 import { logoutAction } from "./actions";
 
 export const metadata: Metadata = { title: "Account | TownHawll" };
 
-export default async function AccountPage() {
-  const user = await requireCurrentVerifiedUser("/account");
+export default async function AccountPage({
+  searchParams,
+}: Readonly<{ searchParams: Promise<{ callbackUrl?: string }> }>) {
+  const { callbackUrl } = await searchParams;
+  const user = await requireCurrentOnboardedUser(
+    getSafeCallbackUrl(callbackUrl),
+  );
+  const destination = getSafeCallbackUrl(callbackUrl);
+  const path = destination.split(/[?#]/, 1)[0];
+  if (path !== "/account" && path !== "/onboarding") {
+    redirect(destination);
+  }
 
   return (
     <main className="mx-auto grid min-h-screen w-[min(100%-2rem,40rem)] content-center gap-6 py-12">

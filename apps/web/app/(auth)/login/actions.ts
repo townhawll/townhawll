@@ -6,6 +6,8 @@ import {
   loginSchema,
 } from "@townhawll/auth/login";
 import { getSafeCallbackUrl } from "@townhawll/auth/redirects";
+import { getPostAuthDestination } from "@townhawll/auth/onboarding";
+import { getOnboardingCompletedAt } from "@townhawll/profile/repository";
 import {
   createLogger,
   getOrCreateRequestId,
@@ -46,6 +48,7 @@ export async function loginAction(
     typeof callbackValue === "string" ? callbackValue : null,
   );
   let requiresVerification = false;
+  let destination = callbackUrl;
 
   const requestHeaders = await headers();
   const requestLogger = withRequestId(
@@ -73,6 +76,10 @@ export async function loginAction(
     } else {
       // Auth.js Credentials is JWT-only. This record uses the database-session
       // format already consumed by the configured Auth.js adapter and auth().
+      destination = getPostAuthDestination(
+        await getOnboardingCompletedAt(result.user.id),
+        callbackUrl,
+      );
       const session = await createDatabaseSession(result.user.id);
       const cookieStore = await cookies();
       cookieStore.set(getAuthSessionCookieName(), session.sessionToken, {
@@ -88,5 +95,5 @@ export async function loginAction(
   }
 
   if (requiresVerification) redirect("/check-email?reason=unverified");
-  redirect(callbackUrl);
+  redirect(destination);
 }

@@ -8,6 +8,8 @@ const nextConfig = {
     "@townhawll/db",
     "@townhawll/email",
     "@townhawll/observability",
+    "@townhawll/profile",
+    "@townhawll/storage",
     "@townhawll/ui",
   ],
 };
