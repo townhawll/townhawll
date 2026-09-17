@@ -1,4 +1,5 @@
 import { getPostAuthDestination } from "@townhawll/auth/onboarding";
+import { getProfileAvatarUrl } from "@townhawll/profile/avatar";
 import { getOnboardingProfile } from "@townhawll/profile/repository";
 import { getInitialOnboardingStep } from "@townhawll/profile/onboarding";
 import type { Metadata } from "next";
@@ -25,8 +26,7 @@ export default async function OnboardingPage({
     );
   }
 
-  const existingAvatarUrl = profile?.avatarUrl ?? null;
-  const avatarUrl = isHttpUrl(existingAvatarUrl) ? existingAvatarUrl : null;
+  const avatarUrl = getProfileAvatarUrl(profile?.avatarUrl);
   const initialStep = getInitialOnboardingStep(
     profile?.onboardingProfileSavedAt,
   );
@@ -50,14 +50,4 @@ export default async function OnboardingPage({
       </section>
     </main>
   );
-}
-
-function isHttpUrl(value: string | null): value is string {
-  if (!value) return false;
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:";
-  } catch {
-    return false;
-  }
 }

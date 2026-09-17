@@ -86,7 +86,7 @@ export async function saveOnboardingProfileAction(
       version: previousState.version,
     };
   }
-  if (result === "already_completed") redirect("/account");
+  if (result === "already_completed") redirect("/settings/profile");
   return {
     saved: true,
     values: parsed.data,
@@ -121,7 +121,7 @@ export async function completeOnboardingAction(
       error: "Save your profile before choosing your TownHawll.",
     };
   }
-  if (result === "already_completed") redirect("/account");
+  if (result === "already_completed") redirect("/settings/profile");
 
   const intendedDestination = getContentFocusDestination(
     parsed.data.contentFocus,

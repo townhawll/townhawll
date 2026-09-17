@@ -1,4 +1,4 @@
-export const DEFAULT_AUTHENTICATED_DESTINATION = "/account";
+export const DEFAULT_AUTHENTICATED_DESTINATION = "/settings/profile";
 
 export function getSafeCallbackUrl(
   value: string | null | undefined,

@@ -4,7 +4,7 @@ import { Button, ImageUploader, Input, Label } from "@townhawll/ui";
 import { useActionState, useState } from "react";
 
 import { SubmitButton } from "../(auth)/_components/submit-button";
-import { logoutAction } from "../(authenticated)/account/actions";
+import { logoutAction } from "../(authenticated)/_actions/logout";
 import {
   completeOnboardingAction,
   saveOnboardingProfileAction,

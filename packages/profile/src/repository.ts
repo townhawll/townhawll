@@ -1,7 +1,10 @@
 import {
   onboardingFocusSchema,
   onboardingProfileSchema,
+  profileDetailsSchema,
+  usernameSchema,
   type OnboardingProfileInput,
+  type ProfileDetailsInput,
 } from "./index.ts";
 
 function isUniqueConstraintError(error: unknown): boolean {
@@ -41,6 +44,136 @@ export async function getOnboardingCompletedAt(userId: string) {
     select: { onboardingCompletedAt: true },
   });
   return profile?.onboardingCompletedAt ?? null;
+}
+
+export interface EditableProfile {
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
+  bio: string | null;
+}
+
+export async function getEditableProfile(
+  userId: string,
+): Promise<EditableProfile | null> {
+  const { db } = await import("@townhawll/db");
+  const profile = await db.profile.findUnique({
+    where: { userId },
+    select: {
+      username: true,
+      displayName: true,
+      avatarUrl: true,
+      bio: true,
+    },
+  });
+
+  if (!profile?.username || !profile.displayName) return null;
+  return {
+    username: profile.username,
+    displayName: profile.displayName,
+    avatarUrl: profile.avatarUrl,
+    bio: profile.bio,
+  };
+}
+
+interface ProfileOwnerRecord {
+  userId: string;
+}
+
+export interface BasicProfileRepository {
+  updateForUser(userId: string, input: ProfileDetailsInput): Promise<boolean>;
+}
+
+async function createBasicProfileRepository(): Promise<BasicProfileRepository> {
+  const { db } = await import("@townhawll/db");
+
+  return {
+    async updateForUser(userId, input) {
+      const updated = await db.profile.updateMany({
+        where: { userId, onboardingCompletedAt: { not: null } },
+        data: {
+          displayName: input.displayName,
+          bio: input.bio || null,
+        },
+      });
+      return updated.count === 1;
+    },
+  };
+}
+
+export type UpdateBasicProfileResult =
+  { status: "saved" } | { status: "profile_missing" };
+
+export async function updateBasicProfile(
+  userId: string,
+  input: ProfileDetailsInput,
+  repository?: BasicProfileRepository,
+): Promise<UpdateBasicProfileResult> {
+  const parsed = profileDetailsSchema.parse(input);
+  const resolvedRepository =
+    repository ?? (await createBasicProfileRepository());
+
+  const updated = await resolvedRepository.updateForUser(userId, parsed);
+  return updated ? { status: "saved" } : { status: "profile_missing" };
+}
+
+export interface UsernameChangeRepository {
+  findByUsername(username: string): Promise<ProfileOwnerRecord | null>;
+  updateUsername(userId: string, username: string): Promise<boolean>;
+}
+
+async function createUsernameChangeRepository(): Promise<UsernameChangeRepository> {
+  const { db } = await import("@townhawll/db");
+
+  return {
+    findByUsername(username) {
+      return db.profile.findUnique({
+        where: { username },
+        select: { userId: true },
+      });
+    },
+    async updateUsername(userId, username) {
+      const updated = await db.profile.updateMany({
+        where: { userId, onboardingCompletedAt: { not: null } },
+        data: { username },
+      });
+      return updated.count === 1;
+    },
+  };
+}
+
+export type ChangeUsernameResult =
+  | { status: "changed"; username: string }
+  | { status: "username_taken" }
+  | { status: "profile_missing" };
+
+export async function changeUsername(
+  userId: string,
+  username: string,
+  repository?: UsernameChangeRepository,
+): Promise<ChangeUsernameResult> {
+  const normalizedUsername = usernameSchema.parse(username);
+  const resolvedRepository =
+    repository ?? (await createUsernameChangeRepository());
+  const occupant = await resolvedRepository.findByUsername(normalizedUsername);
+  if (occupant && occupant.userId !== userId) {
+    return { status: "username_taken" };
+  }
+
+  try {
+    const updated = await resolvedRepository.updateUsername(
+      userId,
+      normalizedUsername,
+    );
+    return updated
+      ? { status: "changed", username: normalizedUsername }
+      : { status: "profile_missing" };
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      return { status: "username_taken" };
+    }
+    throw error;
+  }
 }
 
 export type SaveOnboardingProfileResult =

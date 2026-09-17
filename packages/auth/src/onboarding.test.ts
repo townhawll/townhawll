@@ -10,7 +10,7 @@ void test("incomplete accounts enter onboarding with a safe return URL", () => {
   );
   assert.equal(
     getPostAuthDestination(null, "https://evil.example"),
-    "/onboarding?callbackUrl=%2Faccount",
+    "/onboarding?callbackUrl=%2Fsettings%2Fprofile",
   );
   assert.equal(getPostAuthDestination(null, "/onboarding"), "/onboarding");
 });
@@ -21,9 +21,16 @@ void test("completed accounts bypass onboarding and retain safe callbacks", () =
     getPostAuthDestination(completedAt, "/game/example"),
     "/game/example",
   );
-  assert.equal(getPostAuthDestination(completedAt, "/onboarding"), "/account");
+  assert.equal(
+    getPostAuthDestination(completedAt, "/onboarding"),
+    "/settings/profile",
+  );
+  assert.equal(
+    getPostAuthDestination(completedAt, "/account"),
+    "/settings/profile",
+  );
   assert.equal(
     getPostAuthDestination(completedAt, "//evil.example"),
-    "/account",
+    "/settings/profile",
   );
 });

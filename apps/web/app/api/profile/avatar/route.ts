@@ -11,6 +11,7 @@ import {
   getOrCreateRequestId,
   withRequestId,
 } from "@townhawll/observability";
+import { revalidatePath } from "next/cache";
 import type { NextRequest } from "next/server";
 
 import { auth } from "../../../../auth";
@@ -90,6 +91,8 @@ export async function POST(request: NextRequest) {
         userId: user.id,
       });
     }
+    revalidatePath("/u/[username]", "page");
+    revalidatePath("/settings/profile");
     return Response.json(
       { avatarUrl: result.avatarUrl },
       { headers: { "cache-control": "no-store", "x-request-id": requestId } },
@@ -134,6 +137,8 @@ export async function DELETE(request: NextRequest) {
         userId: user.id,
       });
     }
+    revalidatePath("/u/[username]", "page");
+    revalidatePath("/settings/profile");
     return Response.json(
       { removed: result.removed },
       { headers: { "cache-control": "no-store", "x-request-id": requestId } },

@@ -16,6 +16,18 @@ export interface AvatarRepository {
   ): Promise<boolean>;
 }
 
+export function getProfileAvatarUrl(value: string | null | undefined) {
+  if (!value) return null;
+  if (value.startsWith("/api/storage/")) return value;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 async function createAvatarRepository(): Promise<AvatarRepository> {
   const { db } = await import("@townhawll/db");
   return {

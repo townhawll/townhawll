@@ -13,6 +13,8 @@
     ".": "./src/index.ts",
     "./onboarding": "./src/onboarding.ts",
     "./avatar": "./src/avatar.ts",
+    "./public-profile": "./src/public-profile.ts",
+    "./username-change": "./src/username-change.ts",
     "./repository": "./src/repository.ts"
   },
   "dependencies": {
