@@ -20,11 +20,7 @@ export default async function ProfileSettingsPage({
   searchParams: Promise<{ callbackUrl?: string }>;
 }>) {
   const { callbackUrl } = await searchParams;
-  const requestedDestination = getSafeCallbackUrl(callbackUrl);
-  const destination =
-    requestedDestination.split(/[?#]/, 1)[0] === "/account"
-      ? "/settings/profile"
-      : requestedDestination;
+  const destination = getSafeCallbackUrl(callbackUrl);
   const user = await requireCurrentOnboardedUser(destination);
   const destinationPath = destination.split(/[?#]/, 1)[0];
   if (

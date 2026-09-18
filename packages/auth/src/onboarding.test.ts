@@ -26,10 +26,6 @@ void test("completed accounts bypass onboarding and retain safe callbacks", () =
     "/settings/profile",
   );
   assert.equal(
-    getPostAuthDestination(completedAt, "/account"),
-    "/settings/profile",
-  );
-  assert.equal(
     getPostAuthDestination(completedAt, "//evil.example"),
     "/settings/profile",
   );

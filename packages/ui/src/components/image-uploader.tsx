@@ -5,7 +5,6 @@ import {
   type ChangeEvent,
   type DragEvent,
   type KeyboardEvent,
-  useEffect,
   useId,
   useRef,
   useState,
@@ -32,20 +31,11 @@ export function ImageUploader({
 }: ImageUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
-  const previewObjectUrl = useRef<string | null>(null);
   const [imageUrl, setImageUrl] = useState(initialImageUrl);
   const [isDragging, setIsDragging] = useState(false);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
-
-  useEffect(
-    () => () => {
-      if (previewObjectUrl.current)
-        URL.revokeObjectURL(previewObjectUrl.current);
-    },
-    [],
-  );
 
   function validateClientFile(file: File): string | null {
     if (!accept.split(",").includes(file.type)) {
@@ -64,9 +54,6 @@ export function ImageUploader({
       return;
     }
 
-    if (previewObjectUrl.current) URL.revokeObjectURL(previewObjectUrl.current);
-    previewObjectUrl.current = URL.createObjectURL(file);
-    setImageUrl(previewObjectUrl.current);
     setStatus("uploading");
     setProgress(0);
     setMessage("Uploading image…");
@@ -88,10 +75,6 @@ export function ImageUploader({
         response = {};
       }
       if (request.status >= 200 && request.status < 300 && response.avatarUrl) {
-        if (previewObjectUrl.current) {
-          URL.revokeObjectURL(previewObjectUrl.current);
-          previewObjectUrl.current = null;
-        }
         setImageUrl(response.avatarUrl);
         setProgress(100);
         setStatus("success");

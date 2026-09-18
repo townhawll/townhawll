@@ -10,9 +10,7 @@ export function getPostAuthDestination(
   const path = destination.split(/[?#]/, 1)[0];
 
   if (!needsOnboarding(completedAt)) {
-    return path === "/onboarding" || path === "/account"
-      ? "/settings/profile"
-      : destination;
+    return path === "/onboarding" ? "/settings/profile" : destination;
   }
 
   if (path === "/onboarding") return "/onboarding";

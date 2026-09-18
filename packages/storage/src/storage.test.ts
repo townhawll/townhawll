@@ -50,6 +50,13 @@ void test("object keys are generated below a safe caller-owned prefix", () => {
   assert.throws(() =>
     createObjectKey({ prefix: "../unsafe", extension: "png" }),
   );
+  assert.match(
+    createObjectKey({
+      prefix: `${"/".repeat(10_000)}users/user_1/avatar${"/".repeat(10_000)}`,
+      extension: "png",
+    }),
+    /^users\/user_1\/avatar\/[0-9a-f-]+\.png$/,
+  );
 });
 
 void test("image validation trusts bytes rather than extensions or MIME alone", () => {
