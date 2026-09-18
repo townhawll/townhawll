@@ -13,7 +13,7 @@ export default function SignupPage() {
       <p className="mt-2 text-sm leading-6 text-foreground-secondary">
         Join TownHawll to track and discuss the stories you love.
       </p>
-      <GoogleAuthButton callbackUrl="/account" />
+      <GoogleAuthButton callbackUrl="/settings/profile" />
       <SignupForm />
       <p className="mt-5 text-center text-sm text-foreground-secondary">
         Already have an account?{" "}

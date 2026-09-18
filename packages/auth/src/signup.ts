@@ -1,23 +1,15 @@
 import { takeRateLimit } from "@townhawll/cache";
+import { usernameSchema } from "@townhawll/profile";
 import { z } from "zod";
 
-import { normalizeEmail, normalizeUsername } from "./account.ts";
+import { normalizeEmail } from "./account.ts";
 import { hashPassword } from "./password.ts";
 import { createAuthToken, hashAuthToken } from "./tokens.ts";
 
 const VERIFICATION_TOKEN_LIFETIME_MS = 24 * 60 * 60 * 1_000;
 
 export const signupSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(3, "Username must contain at least 3 characters.")
-    .max(30, "Username must contain at most 30 characters.")
-    .regex(
-      /^[a-zA-Z0-9_]+$/,
-      "Username can contain only letters, numbers, and underscores.",
-    )
-    .transform(normalizeUsername),
+  username: usernameSchema,
   email: z
     .string()
     .trim()
@@ -66,7 +58,10 @@ export async function registerPasswordUser(
   const { db } = await import("@townhawll/db");
   const existingUser = await db.user.findFirst({
     where: {
-      OR: [{ email: parsedInput.email }, { username: parsedInput.username }],
+      OR: [
+        { email: parsedInput.email },
+        { profile: { is: { username: parsedInput.username } } },
+      ],
     },
     select: { id: true },
   });
@@ -84,8 +79,13 @@ export async function registerPasswordUser(
       await transaction.user.create({
         data: {
           email: parsedInput.email,
-          username: parsedInput.username,
           passwordHash,
+          profile: {
+            create: {
+              username: parsedInput.username,
+              displayName: parsedInput.username,
+            },
+          },
         },
       });
       await transaction.verificationToken.create({

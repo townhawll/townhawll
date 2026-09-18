@@ -1,0 +1,33 @@
+{
+  "name": "@townhawll/profile",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "tsx --test src/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./onboarding": "./src/onboarding.ts",
+    "./avatar": "./src/avatar.ts",
+    "./public-profile": "./src/public-profile.ts",
+    "./username-change": "./src/username-change.ts",
+    "./repository": "./src/repository.ts"
+  },
+  "dependencies": {
+    "@townhawll/db": "workspace:*",
+    "@townhawll/storage": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@townhawll/eslint-config": "workspace:*",
+    "@townhawll/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
+  }
+}

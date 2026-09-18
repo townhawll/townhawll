@@ -1,7 +1,7 @@
 generator client {
-  provider     = "prisma-client"
-  output       = "../generated/prisma"
-  moduleFormat = "esm"
+  provider            = "prisma-client"
+  output              = "../generated/prisma"
+  moduleFormat        = "esm"
   importFileExtension = "ts"
 }
 
@@ -20,7 +20,6 @@ enum AccountStatus {
 model User {
   id            String               @id @default(cuid())
   email         String               @unique @db.Citext
-  username      String?              @unique @db.Citext
   passwordHash  String?              @map("password_hash") @db.Text
   emailVerified DateTime?            @map("email_verified")
   name          String?
@@ -31,8 +30,32 @@ model User {
   accounts      Account[]
   sessions      Session[]
   resetTokens   PasswordResetToken[]
+  profile       Profile?
 
   @@map("users")
+}
+
+enum ContentFocus {
+  GAMES
+  SCREEN
+  BOTH
+}
+
+model Profile {
+  userId                   String        @id @map("user_id")
+  username                 String?       @unique @db.Citext
+  displayName              String?       @map("display_name")
+  avatarUrl                String?       @map("avatar_url") @db.Text
+  avatarObjectKey          String?       @map("avatar_object_key") @db.Text
+  bio                      String?       @db.VarChar(500)
+  contentFocus             ContentFocus? @map("content_focus")
+  onboardingProfileSavedAt DateTime?     @map("onboarding_profile_saved_at")
+  onboardingCompletedAt    DateTime?     @map("onboarding_completed_at")
+  createdAt                DateTime      @default(now()) @map("created_at")
+  updatedAt                DateTime      @updatedAt @map("updated_at")
+  user                     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
 }
 
 model Account {

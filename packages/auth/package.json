@@ -15,6 +15,7 @@
     "./guards": "./src/guards.ts",
     "./google": "./src/google.ts",
     "./login": "./src/login.ts",
+    "./onboarding": "./src/onboarding.ts",
     "./password": "./src/password.ts",
     "./password-reset": "./src/password-reset.ts",
     "./redirects": "./src/redirects.ts",
@@ -28,6 +29,7 @@
     "@townhawll/config": "workspace:*",
     "@townhawll/cache": "workspace:*",
     "@townhawll/db": "workspace:*",
+    "@townhawll/profile": "workspace:*",
     "next-auth": "catalog:",
     "zod": "catalog:"
   },

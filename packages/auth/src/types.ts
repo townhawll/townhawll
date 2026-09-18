@@ -12,7 +12,6 @@ declare module "next-auth" {
   }
 
   interface User {
-    username: string | null;
     emailVerified: Date | null;
     status: AccountStatus;
   }

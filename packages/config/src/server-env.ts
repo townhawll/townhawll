@@ -59,6 +59,35 @@ const observabilityEnvironmentSchema = runtimeEnvironmentSchema.extend({
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 });
 
+const optionalTrimmedString = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim() === "" ? undefined : value,
+  z.string().trim().min(1).optional(),
+);
+
+const storageEnvironmentSchema = runtimeEnvironmentSchema.extend({
+  STORAGE_DRIVER: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.enum(["local", "r2"]).optional(),
+  ),
+  R2_ACCOUNT_ID: optionalTrimmedString,
+  R2_ACCESS_KEY_ID: optionalTrimmedString,
+  R2_SECRET_ACCESS_KEY: optionalTrimmedString,
+  R2_BUCKET_NAME: optionalTrimmedString,
+  R2_PUBLIC_URL: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.trim() === "" ? undefined : value,
+    z
+      .string()
+      .url()
+      .refine(
+        (value) => value.startsWith("https://") || value.startsWith("http://"),
+        "R2_PUBLIC_URL must use the http:// or https:// protocol.",
+      )
+      .optional(),
+  ),
+});
+
 const serverEnvironmentSchema = dbEnvironmentSchema.extend(
   redisEnvironmentSchema.shape,
 );
@@ -137,6 +166,66 @@ export function loadObservabilityEnvironment(
   }
 
   return result.data;
+}
+
+export type StorageEnvironment =
+  | { driver: "local"; nodeEnv: "development" | "test" }
+  | {
+      driver: "r2";
+      nodeEnv: "development" | "test" | "production";
+      accountId: string;
+      accessKeyId: string;
+      secretAccessKey: string;
+      bucketName: string;
+      publicUrl: string;
+    };
+
+export function loadStorageEnvironment(
+  environment: NodeJS.ProcessEnv = process.env,
+): StorageEnvironment {
+  const result = storageEnvironmentSchema.safeParse(environment);
+  if (!result.success) throw invalidEnvironment(result.error);
+
+  const values = result.data;
+  const r2Values = [
+    values.R2_ACCOUNT_ID,
+    values.R2_ACCESS_KEY_ID,
+    values.R2_SECRET_ACCESS_KEY,
+    values.R2_BUCKET_NAME,
+    values.R2_PUBLIC_URL,
+  ];
+  const hasAnyR2Value = r2Values.some(Boolean);
+  const hasAllR2Values = r2Values.every(Boolean);
+  const driver = values.STORAGE_DRIVER ?? (hasAllR2Values ? "r2" : "local");
+
+  if (hasAnyR2Value && !hasAllR2Values) {
+    throw new Error(
+      "Invalid server environment: all R2 variables are required when any R2 variable is configured.",
+    );
+  }
+  if (driver === "local") {
+    if (values.NODE_ENV === "production") {
+      throw new Error(
+        "Invalid server environment: production object storage must use the r2 driver.",
+      );
+    }
+    return { driver, nodeEnv: values.NODE_ENV };
+  }
+  if (!hasAllR2Values) {
+    throw new Error(
+      "Invalid server environment: the r2 storage driver requires all R2 variables.",
+    );
+  }
+
+  return {
+    driver,
+    nodeEnv: values.NODE_ENV,
+    accountId: values.R2_ACCOUNT_ID!,
+    accessKeyId: values.R2_ACCESS_KEY_ID!,
+    secretAccessKey: values.R2_SECRET_ACCESS_KEY!,
+    bucketName: values.R2_BUCKET_NAME!,
+    publicUrl: values.R2_PUBLIC_URL!,
+  };
 }
 
 export function loadWebSentryEnvironment(

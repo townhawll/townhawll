@@ -106,7 +106,6 @@ void test("marks users created through the Google adapter as verified", async ()
     image: null,
     name: "User",
     status: "ACTIVE",
-    username: null,
   });
 
   assert.equal(createdUser?.emailVerified, verifiedAt);
