@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   canAssignRole,
@@ -7,24 +6,24 @@ import {
   canRemoveRole,
 } from "./staff-management.ts";
 
-void test("ADMIN can manage basic staff", () => {
-  assert.equal(canManageStaff(["ADMIN"], ["CONTENT_EDITOR"]), true);
-  assert.equal(canManageStaff(["ADMIN"], ["MODERATOR"]), true);
-  assert.equal(canAssignRole(["ADMIN"], "CONTENT_EDITOR"), true);
-  assert.equal(canAssignRole(["ADMIN"], "MODERATOR"), true);
-  assert.equal(canRemoveRole(["ADMIN"], "CONTENT_EDITOR"), true);
-  assert.equal(canRemoveRole(["ADMIN"], "MODERATOR"), true);
+test("ADMIN can manage basic staff", () => {
+  expect(canManageStaff(["ADMIN"], ["CONTENT_EDITOR"])).toBe(true);
+  expect(canManageStaff(["ADMIN"], ["MODERATOR"])).toBe(true);
+  expect(canAssignRole(["ADMIN"], "CONTENT_EDITOR")).toBe(true);
+  expect(canAssignRole(["ADMIN"], "MODERATOR")).toBe(true);
+  expect(canRemoveRole(["ADMIN"], "CONTENT_EDITOR")).toBe(true);
+  expect(canRemoveRole(["ADMIN"], "MODERATOR")).toBe(true);
 });
 
-void test("ADMIN cannot manage or grant privileged roles", () => {
+test("ADMIN cannot manage or grant privileged roles", () => {
   for (const role of ["ADMIN", "TECHNICAL_ADMIN", "OWNER"] as const) {
-    assert.equal(canManageStaff(["ADMIN"], [role]), false);
-    assert.equal(canAssignRole(["ADMIN"], role), false);
-    assert.equal(canRemoveRole(["ADMIN"], role), false);
+    expect(canManageStaff(["ADMIN"], [role])).toBe(false);
+    expect(canAssignRole(["ADMIN"], role)).toBe(false);
+    expect(canRemoveRole(["ADMIN"], role)).toBe(false);
   }
 });
 
-void test("OWNER can manage and grant privileged roles", () => {
+test("OWNER can manage and grant privileged roles", () => {
   for (const role of [
     "CONTENT_EDITOR",
     "MODERATOR",
@@ -32,21 +31,20 @@ void test("OWNER can manage and grant privileged roles", () => {
     "TECHNICAL_ADMIN",
     "OWNER",
   ] as const) {
-    assert.equal(canManageStaff(["OWNER"], [role]), true);
-    assert.equal(canAssignRole(["OWNER"], role), true);
-    assert.equal(canRemoveRole(["OWNER"], role), true);
+    expect(canManageStaff(["OWNER"], [role])).toBe(true);
+    expect(canAssignRole(["OWNER"], role)).toBe(true);
+    expect(canRemoveRole(["OWNER"], role)).toBe(true);
   }
 });
 
-void test("non-management roles cannot escalate privileges", () => {
-  assert.equal(canManageStaff(["TECHNICAL_ADMIN"], ["MODERATOR"]), false);
-  assert.equal(canAssignRole(["MODERATOR"], "ADMIN"), false);
-  assert.equal(canRemoveRole(["CONTENT_EDITOR"], "MODERATOR"), false);
+test("non-management roles cannot escalate privileges", () => {
+  expect(canManageStaff(["TECHNICAL_ADMIN"], ["MODERATOR"])).toBe(false);
+  expect(canAssignRole(["MODERATOR"], "ADMIN")).toBe(false);
+  expect(canRemoveRole(["CONTENT_EDITOR"], "MODERATOR")).toBe(false);
 });
 
-void test("ADMIN cannot modify a target that also has a privileged role", () => {
-  assert.equal(
-    canManageStaff(["ADMIN"], ["CONTENT_EDITOR", "TECHNICAL_ADMIN"]),
+test("ADMIN cannot modify a target that also has a privileged role", () => {
+  expect(canManageStaff(["ADMIN"], ["CONTENT_EDITOR", "TECHNICAL_ADMIN"])).toBe(
     false,
   );
 });

@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test, vi } from "vitest";
 
 import {
   bootstrapFirstOwner,
@@ -7,49 +6,36 @@ import {
   OwnerBootstrapUserError,
 } from "./bootstrap-owner.ts";
 
-void test("first OWNER bootstrap normalizes the selected account email", async () => {
-  let selectedEmail: string | undefined;
+test("first OWNER bootstrap normalizes the selected account email", async () => {
+  const assignFirstOwner = vi.fn(() => Promise.resolve({ userId: "user_1" }));
   const result = await bootstrapFirstOwner(" OWNER@Example.COM ", {
-    dependencies: {
-      assignFirstOwner(email) {
-        selectedEmail = email;
-        return Promise.resolve({ userId: "user_1" });
-      },
-    },
+    dependencies: { assignFirstOwner },
     nodeEnv: "development",
   });
 
-  assert.equal(selectedEmail, "owner@example.com");
-  assert.deepEqual(result, { userId: "user_1" });
+  expect(assignFirstOwner).toHaveBeenCalledOnce();
+  expect(assignFirstOwner).toHaveBeenCalledWith("owner@example.com");
+  expect(result).toStrictEqual({ userId: "user_1" });
 });
 
-void test("OWNER bootstrap rejects invalid emails before database access", async () => {
-  let called = false;
-  await assert.rejects(
+test("OWNER bootstrap rejects invalid emails before database access", async () => {
+  const assignFirstOwner = vi.fn(() => Promise.resolve({ userId: "user_1" }));
+  await expect(
     bootstrapFirstOwner("not-an-email", {
-      dependencies: {
-        assignFirstOwner() {
-          called = true;
-          return Promise.resolve({ userId: "user_1" });
-        },
-      },
+      dependencies: { assignFirstOwner },
       nodeEnv: "development",
     }),
-    OwnerBootstrapUserError,
-  );
-  assert.equal(called, false);
+  ).rejects.toThrow(OwnerBootstrapUserError);
+  expect(assignFirstOwner).not.toHaveBeenCalled();
 });
 
-void test("OWNER bootstrap is disabled in production", async () => {
-  await assert.rejects(
+test("OWNER bootstrap is disabled in production", async () => {
+  const assignFirstOwner = vi.fn(() => Promise.resolve({ userId: "user_1" }));
+  await expect(
     bootstrapFirstOwner("owner@example.com", {
-      dependencies: {
-        assignFirstOwner() {
-          return Promise.resolve({ userId: "user_1" });
-        },
-      },
+      dependencies: { assignFirstOwner },
       nodeEnv: "production",
     }),
-    OwnerBootstrapProductionError,
-  );
+  ).rejects.toThrow(OwnerBootstrapProductionError);
+  expect(assignFirstOwner).not.toHaveBeenCalled();
 });

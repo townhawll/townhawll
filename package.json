@@ -22,7 +22,8 @@
   "devDependencies": {
     "prettier": "catalog:",
     "turbo": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "packageManager": "pnpm@11.25.0",
   "engines": {

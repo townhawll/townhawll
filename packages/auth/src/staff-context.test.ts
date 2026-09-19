@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import type { AccountStatus, StaffRole } from "@townhawll/db";
 
@@ -22,37 +21,36 @@ function identity(overrides: Partial<SessionIdentity> = {}): SessionIdentity {
   };
 }
 
-void test("a valid user with one role resolves to current staff", () => {
+test("a valid user with one role resolves to current staff", () => {
   const state = resolveStaffAccess(identity());
-  assert.equal(state.status, "authorized");
+  expect(state.status).toBe("authorized");
   if (state.status === "authorized") {
-    assert.deepEqual(state.staff.roles, ["CONTENT_EDITOR"]);
-    assert.equal(state.staff.permissions.has(PERMISSION.CONTENT_PUBLISH), true);
+    expect(state.staff.roles).toStrictEqual(["CONTENT_EDITOR"]);
+    expect(state.staff.permissions.has(PERMISSION.CONTENT_PUBLISH)).toBe(true);
   }
 });
 
-void test("multiple roles resolve to a current permission union", () => {
+test("multiple roles resolve to a current permission union", () => {
   const roles = ["CONTENT_EDITOR", "MODERATOR"] satisfies StaffRole[];
   const state = resolveStaffAccess(identity({ roles }));
-  assert.equal(state.status, "authorized");
+  expect(state.status).toBe("authorized");
   if (state.status === "authorized") {
-    assert.equal(state.staff.permissions.has(PERMISSION.CONTENT_PUBLISH), true);
-    assert.equal(
-      state.staff.permissions.has(PERMISSION.MODERATION_ACTION),
+    expect(state.staff.permissions.has(PERMISSION.CONTENT_PUBLISH)).toBe(true);
+    expect(state.staff.permissions.has(PERMISSION.MODERATION_ACTION)).toBe(
       true,
     );
   }
 });
 
-void test("a normal authenticated user is forbidden", () => {
-  assert.deepEqual(resolveStaffAccess(identity({ roles: [] })), {
+test("a normal authenticated user is forbidden", () => {
+  expect(resolveStaffAccess(identity({ roles: [] }))).toStrictEqual({
     reason: "roles",
     status: "forbidden",
   });
 });
 
-void test("unverified and non-active accounts are forbidden", () => {
-  assert.deepEqual(resolveStaffAccess(identity({ emailVerified: null })), {
+test("unverified and non-active accounts are forbidden", () => {
+  expect(resolveStaffAccess(identity({ emailVerified: null }))).toStrictEqual({
     reason: "verification",
     status: "forbidden",
   });
@@ -63,16 +61,16 @@ void test("unverified and non-active accounts are forbidden", () => {
     "BANNED",
     "DELETED",
   ] satisfies AccountStatus[]) {
-    assert.deepEqual(resolveStaffAccess(identity({ status })), {
+    expect(resolveStaffAccess(identity({ status }))).toStrictEqual({
       reason: "account",
       status: "forbidden",
     });
   }
 });
 
-void test("missing and expired sessions are unauthenticated", async () => {
+test("missing and expired sessions are unauthenticated", async () => {
   const now = new Date("2026-09-19T12:00:00.000Z");
-  assert.deepEqual(await getStaffAccessBySessionToken(undefined), {
+  expect(await getStaffAccessBySessionToken(undefined)).toStrictEqual({
     status: "unauthenticated",
   });
 
@@ -93,11 +91,11 @@ void test("missing and expired sessions are unauthenticated", async () => {
     now,
   );
 
-  assert.deepEqual(state, { status: "unauthenticated" });
-  assert.equal(expiredSessionDeleted, true);
+  expect(state).toStrictEqual({ status: "unauthenticated" });
+  expect(expiredSessionDeleted).toBe(true);
 });
 
-void test("session lookup evaluates fresh staff roles", async () => {
+test("session lookup evaluates fresh staff roles", async () => {
   const state = await getStaffAccessBySessionToken("valid-token", {
     deleteExpiredSession: () => Promise.resolve(),
     findSession: () =>
@@ -107,12 +105,11 @@ void test("session lookup evaluates fresh staff roles", async () => {
       }),
   });
 
-  assert.equal(state.status, "authorized");
+  expect(state.status).toBe("authorized");
   if (state.status === "authorized") {
-    assert.deepEqual(state.staff.roles, ["OWNER"]);
-    assert.equal(
+    expect(state.staff.roles).toStrictEqual(["OWNER"]);
+    expect(
       state.staff.permissions.has(PERMISSION.SYSTEM_EMERGENCY_LOCKDOWN),
-      true,
-    );
+    ).toBe(true);
   }
 });

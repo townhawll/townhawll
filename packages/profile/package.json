@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "lint": "eslint .",
-    "test": "tsx --test src/*.test.ts",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "exports": {
@@ -27,7 +27,7 @@
     "@townhawll/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",
-    "tsx": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

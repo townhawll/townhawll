@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   type BasicProfileRepository,
@@ -26,7 +25,7 @@ function createDetailsRepository(options?: {
   return { calls, repository };
 }
 
-void test("profile edits normalize values and target only the authenticated user", async () => {
+test("profile edits normalize values and target only the authenticated user", async () => {
   const { calls, repository } = createDetailsRepository();
   const result = await updateBasicProfile(
     "authenticated_user",
@@ -34,8 +33,8 @@ void test("profile edits normalize values and target only the authenticated user
     repository,
   );
 
-  assert.deepEqual(result, { status: "saved" });
-  assert.deepEqual(calls, [
+  expect(result).toStrictEqual({ status: "saved" });
+  expect(calls).toStrictEqual([
     {
       userId: "authenticated_user",
       input: { displayName: "Player One", bio: "Hello TownHawll" },
@@ -43,24 +42,24 @@ void test("profile edits normalize values and target only the authenticated user
   ]);
 });
 
-void test("optional bio can be cleared", async () => {
+test("optional bio can be cleared", async () => {
   const { calls, repository } = createDetailsRepository();
   await updateBasicProfile(
     "user_1",
     { displayName: "Player", bio: "   " },
     repository,
   );
-  assert.equal(calls[0]?.input.bio, "");
+  expect(calls[0]?.input.bio).toBe("");
 });
 
-void test("missing or incomplete profiles are not updated", async () => {
+test("missing or incomplete profiles are not updated", async () => {
   const { repository } = createDetailsRepository({ updateResult: false });
   const result = await updateBasicProfile(
     "user_1",
     { displayName: "Player", bio: "" },
     repository,
   );
-  assert.deepEqual(result, { status: "profile_missing" });
+  expect(result).toStrictEqual({ status: "profile_missing" });
 });
 
 function createUsernameRepository(options?: {
@@ -84,7 +83,7 @@ function createUsernameRepository(options?: {
   return { calls, repository };
 }
 
-void test("username changes normalize before the dedicated mutation", async () => {
+test("username changes normalize before the dedicated mutation", async () => {
   const { calls, repository } = createUsernameRepository();
   const result = await changeUsername(
     "authenticated_user",
@@ -92,31 +91,30 @@ void test("username changes normalize before the dedicated mutation", async () =
     repository,
   );
 
-  assert.deepEqual(result, { status: "changed", username: "player_one" });
-  assert.deepEqual(calls, [
+  expect(result).toStrictEqual({ status: "changed", username: "player_one" });
+  expect(calls).toStrictEqual([
     { userId: "authenticated_user", username: "player_one" },
   ]);
 });
 
-void test("another user's username cannot be claimed", async () => {
+test("another user's username cannot be claimed", async () => {
   const { calls, repository } = createUsernameRepository({
     occupantId: "user_2",
   });
   const result = await changeUsername("user_1", "player_two", repository);
-  assert.deepEqual(result, { status: "username_taken" });
-  assert.equal(calls.length, 0);
+  expect(result).toStrictEqual({ status: "username_taken" });
+  expect(calls.length).toBe(0);
 });
 
-void test("invalid usernames are rejected before persistence", async () => {
+test("invalid usernames are rejected before persistence", async () => {
   const { calls, repository } = createUsernameRepository();
-  await assert.rejects(
-    changeUsername("user_1", "admin", repository),
+  await expect(changeUsername("user_1", "admin", repository)).rejects.toThrow(
     /reserved/i,
   );
-  assert.equal(calls.length, 0);
+  expect(calls.length).toBe(0);
 });
 
-void test("a unique-constraint race becomes a safe username result", async () => {
+test("a unique-constraint race becomes a safe username result", async () => {
   const conflict = Object.assign(new Error("Unique constraint failed."), {
     code: "P2002",
   });
@@ -124,5 +122,5 @@ void test("a unique-constraint race becomes a safe username result", async () =>
     updateError: conflict,
   });
   const result = await changeUsername("user_1", "player_one", repository);
-  assert.deepEqual(result, { status: "username_taken" });
+  expect(result).toStrictEqual({ status: "username_taken" });
 });

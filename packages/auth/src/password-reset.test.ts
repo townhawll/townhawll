@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import { hashPassword, verifyPassword } from "./password.ts";
 import {
@@ -105,35 +104,34 @@ function createHarness(options?: {
   };
 }
 
-void test("creates a durable reset token for a known email", async () => {
+test("creates a durable reset token for a known email", async () => {
   const harness = createHarness();
   const request = await createPasswordResetRequest(
     { email: " USER@Example.com " },
     harness.dependencies,
   );
 
-  assert.equal(request?.email, "user@example.com");
-  assert.equal(request?.token, RAW_TOKEN);
-  assert.equal(request?.tokenHash, hashAuthToken(RAW_TOKEN));
-  assert.notEqual(request?.tokenHash, request?.token);
+  expect(request?.email).toBe("user@example.com");
+  expect(request?.token).toBe(RAW_TOKEN);
+  expect(request?.tokenHash).toBe(hashAuthToken(RAW_TOKEN));
+  expect(request?.tokenHash).not.toBe(request?.token);
 });
 
-void test("returns no reset details for an unknown email", async () => {
+test("returns no reset details for an unknown email", async () => {
   const harness = createHarness({ hasUser: false });
   const request = await createPasswordResetRequest(
     { email: "unknown@example.com" },
     harness.dependencies,
   );
 
-  assert.equal(request, null);
+  expect(request).toBe(null);
 });
 
-void test("reports invalid and expired reset tokens", async () => {
+test("reports invalid and expired reset tokens", async () => {
   const invalidHarness = createHarness();
-  assert.equal(
+  expect(
     await getPasswordResetTokenStatus("invalid", invalidHarness.dependencies),
-    "invalid",
-  );
+  ).toBe("invalid");
 
   const expiredHarness = createHarness({
     expiresAt: new Date(NOW.getTime() - 1),
@@ -142,13 +140,12 @@ void test("reports invalid and expired reset tokens", async () => {
     { email: "user@example.com" },
     expiredHarness.dependencies,
   );
-  assert.equal(
+  expect(
     await getPasswordResetTokenStatus(RAW_TOKEN, expiredHarness.dependencies),
-    "expired",
-  );
+  ).toBe("expired");
 });
 
-void test("resets the password once and revokes every existing session", async () => {
+test("resets the password once and revokes every existing session", async () => {
   const harness = createHarness();
   await createPasswordResetRequest(
     { email: "user@example.com" },
@@ -164,18 +161,16 @@ void test("resets the password once and revokes every existing session", async (
     harness.dependencies,
   );
 
-  assert.deepEqual(result, { revokedSessions: 3, status: "reset" });
-  assert.equal(
-    await verifyPassword(harness.getPasswordHash(), "old-password"),
+  expect(result).toStrictEqual({ revokedSessions: 3, status: "reset" });
+  expect(await verifyPassword(harness.getPasswordHash(), "old-password")).toBe(
     false,
   );
-  assert.equal(
-    await verifyPassword(harness.getPasswordHash(), "new-password"),
+  expect(await verifyPassword(harness.getPasswordHash(), "new-password")).toBe(
     true,
   );
-  assert.equal(harness.getSessions(), 0);
+  expect(harness.getSessions()).toBe(0);
 
-  assert.deepEqual(
+  expect(
     await resetPassword(
       {
         confirmPassword: "another-password",
@@ -184,6 +179,5 @@ void test("resets the password once and revokes every existing session", async (
       },
       harness.dependencies,
     ),
-    { status: "invalid" },
-  );
+  ).toStrictEqual({ status: "invalid" });
 });

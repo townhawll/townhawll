@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   getPublicProfilePath,
@@ -18,7 +17,7 @@ const record = {
   user: { createdAt: new Date("2026-09-01T00:00:00.000Z") },
 };
 
-void test("public profile lookup normalizes username input", async () => {
+test("public profile lookup normalizes username input", async () => {
   let lookup = "";
   const repository: PublicProfileRepository = {
     findByUsername(username) {
@@ -28,11 +27,11 @@ void test("public profile lookup normalizes username input", async () => {
   };
 
   const profile = await getPublicProfileByUsername("  ToWn_UsEr ", repository);
-  assert.equal(lookup, "town_user");
-  assert.equal(profile?.username, "town_user");
+  expect(lookup).toBe("town_user");
+  expect(profile?.username).toBe("town_user");
 });
 
-void test("invalid and missing usernames do not produce public profiles", async () => {
+test("invalid and missing usernames do not produce public profiles", async () => {
   let lookupCount = 0;
   const repository: PublicProfileRepository = {
     findByUsername() {
@@ -41,16 +40,13 @@ void test("invalid and missing usernames do not produce public profiles", async 
     },
   };
 
-  assert.equal(
-    await getPublicProfileByUsername("not-valid!", repository),
-    null,
-  );
-  assert.equal(lookupCount, 0);
-  assert.equal(await getPublicProfileByUsername("missing", repository), null);
-  assert.equal(lookupCount, 1);
+  expect(await getPublicProfileByUsername("not-valid!", repository)).toBe(null);
+  expect(lookupCount).toBe(0);
+  expect(await getPublicProfileByUsername("missing", repository)).toBe(null);
+  expect(lookupCount).toBe(1);
 });
 
-void test("public profile mapping exposes only approved identity fields", async () => {
+test("public profile mapping exposes only approved identity fields", async () => {
   const repository: PublicProfileRepository = {
     findByUsername() {
       return Promise.resolve({
@@ -62,7 +58,7 @@ void test("public profile mapping exposes only approved identity fields", async 
   };
 
   const profile = await getPublicProfileByUsername("town_user", repository);
-  assert.deepEqual(profile, {
+  expect(profile).toStrictEqual({
     userId: "user_1",
     username: "town_user",
     displayName: "Town User",
@@ -70,18 +66,18 @@ void test("public profile mapping exposes only approved identity fields", async 
     bio: "Games and films.",
     joinedAt: new Date("2026-09-01T00:00:00.000Z"),
   });
-  assert.equal("email" in (profile ?? {}), false);
-  assert.equal("status" in (profile ?? {}), false);
+  expect("email" in (profile ?? {})).toBe(false);
+  expect("status" in (profile ?? {})).toBe(false);
 });
 
-void test("canonical usernames and profile ownership use exact stored identity", () => {
-  assert.equal(isCanonicalProfileUsername("town_user", "town_user"), true);
-  assert.equal(isCanonicalProfileUsername("Town_User", "town_user"), false);
-  assert.equal(isProfileOwner("user_1", "user_1"), true);
-  assert.equal(isProfileOwner("user_1", "user_2"), false);
-  assert.equal(isProfileOwner("user_1", null), false);
+test("canonical usernames and profile ownership use exact stored identity", () => {
+  expect(isCanonicalProfileUsername("town_user", "town_user")).toBe(true);
+  expect(isCanonicalProfileUsername("Town_User", "town_user")).toBe(false);
+  expect(isProfileOwner("user_1", "user_1")).toBe(true);
+  expect(isProfileOwner("user_1", "user_2")).toBe(false);
+  expect(isProfileOwner("user_1", null)).toBe(false);
 });
 
-void test("public profile paths use the canonical username", () => {
-  assert.equal(getPublicProfilePath("player_one"), "/u/player_one");
+test("public profile paths use the canonical username", () => {
+  expect(getPublicProfilePath("player_one")).toBe("/u/player_one");
 });

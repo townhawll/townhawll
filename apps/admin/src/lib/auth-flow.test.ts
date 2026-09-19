@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import type { StaffAccessState } from "@townhawll/auth/staff-context";
 
@@ -28,24 +27,23 @@ const authorized = {
   },
 } satisfies StaffAccessState;
 
-void test("admin root routes each access state without a redirect loop", () => {
-  assert.equal(getAdminRootDestination(unauthenticated), "/login");
-  assert.equal(getAdminRootDestination(forbidden), "/403");
-  assert.equal(getAdminRootDestination(authorized), "/dashboard");
+test("admin root routes each access state without a redirect loop", () => {
+  expect(getAdminRootDestination(unauthenticated)).toBe("/login");
+  expect(getAdminRootDestination(forbidden)).toBe("/403");
+  expect(getAdminRootDestination(authorized)).toBe("/dashboard");
 });
 
-void test("login stays visible only for unauthenticated visitors", () => {
-  assert.equal(getAdminLoginDestination(unauthenticated, null), null);
-  assert.equal(getAdminLoginDestination(forbidden, null), "/403");
-  assert.equal(
-    getAdminLoginDestination(authorized, "/content?tab=drafts"),
+test("login stays visible only for unauthenticated visitors", () => {
+  expect(getAdminLoginDestination(unauthenticated, null)).toBe(null);
+  expect(getAdminLoginDestination(forbidden, null)).toBe("/403");
+  expect(getAdminLoginDestination(authorized, "/content?tab=drafts")).toBe(
     "/content?tab=drafts",
   );
 });
 
-void test("admin callbacks reject external and login-loop destinations", () => {
-  assert.equal(getSafeAdminCallbackUrl("https://example.com"), "/dashboard");
-  assert.equal(getSafeAdminCallbackUrl("//example.com"), "/dashboard");
-  assert.equal(getSafeAdminCallbackUrl("/login"), "/dashboard");
-  assert.equal(getSafeAdminCallbackUrl("/login?next=/login"), "/dashboard");
+test("admin callbacks reject external and login-loop destinations", () => {
+  expect(getSafeAdminCallbackUrl("https://example.com")).toBe("/dashboard");
+  expect(getSafeAdminCallbackUrl("//example.com")).toBe("/dashboard");
+  expect(getSafeAdminCallbackUrl("/login")).toBe("/dashboard");
+  expect(getSafeAdminCallbackUrl("/login?next=/login")).toBe("/dashboard");
 });

@@ -1,6 +1,5 @@
-import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   completeOnboarding,
@@ -21,7 +20,7 @@ if (databaseUrl) {
   }
 }
 
-void test(
+test(
   "onboarding persists steps, rejects duplicate usernames, and completes once",
   { skip: !enabled || !localDatabase },
   async () => {
@@ -36,37 +35,33 @@ void test(
     });
 
     try {
-      assert.equal(
-        await completeOnboarding(first.id, "GAMES"),
+      expect(await completeOnboarding(first.id, "GAMES")).toBe(
         "profile_incomplete",
       );
-      assert.equal(
+      expect(
         await saveOnboardingProfile(first.id, {
           username: username.toUpperCase(),
           displayName: "Player",
           bio: "",
         }),
-        "saved",
-      );
-      assert.equal(
+      ).toBe("saved");
+      expect(
         await saveOnboardingProfile(second.id, {
           username,
           displayName: "Another player",
           bio: "",
         }),
-        "username_taken",
-      );
+      ).toBe("username_taken");
       const afterStepOne = await getOnboardingProfile(first.id);
-      assert.equal(afterStepOne?.profile?.username, username);
-      assert.ok(afterStepOne?.profile?.onboardingProfileSavedAt);
-      assert.equal(afterStepOne?.profile?.onboardingCompletedAt, null);
+      expect(afterStepOne?.profile?.username).toBe(username);
+      expect(afterStepOne?.profile?.onboardingProfileSavedAt).toBeTruthy();
+      expect(afterStepOne?.profile?.onboardingCompletedAt).toBe(null);
 
-      assert.equal(await completeOnboarding(first.id, "SCREEN"), "completed");
+      expect(await completeOnboarding(first.id, "SCREEN")).toBe("completed");
       const completed = await getOnboardingProfile(first.id);
-      assert.equal(completed?.profile?.contentFocus, "SCREEN");
-      assert.ok(completed?.profile?.onboardingCompletedAt);
-      assert.equal(
-        await completeOnboarding(first.id, "BOTH"),
+      expect(completed?.profile?.contentFocus).toBe("SCREEN");
+      expect(completed?.profile?.onboardingCompletedAt).toBeTruthy();
+      expect(await completeOnboarding(first.id, "BOTH")).toBe(
         "already_completed",
       );
     } finally {

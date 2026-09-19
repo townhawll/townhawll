@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   contentFocusSchema,
@@ -8,12 +7,12 @@ import {
   usernameSchema,
 } from "./index.ts";
 
-void test("usernames normalize before validation", () => {
-  assert.equal(normalizeUsername("  Town_User  "), "town_user");
-  assert.equal(usernameSchema.parse("  Town_User  "), "town_user");
+test("usernames normalize before validation", () => {
+  expect(normalizeUsername("  Town_User  ")).toBe("town_user");
+  expect(usernameSchema.parse("  Town_User  ")).toBe("town_user");
 });
 
-void test("usernames reject unsafe, reserved, and out-of-range values", () => {
+test("usernames reject unsafe, reserved, and out-of-range values", () => {
   for (const value of [
     "ab",
     "a".repeat(31),
@@ -25,29 +24,26 @@ void test("usernames reject unsafe, reserved, and out-of-range values", () => {
     "townhawll",
     "onboarding",
   ]) {
-    assert.equal(usernameSchema.safeParse(value).success, false, value);
+    expect(usernameSchema.safeParse(value).success, value).toBe(false);
   }
-  assert.equal(usernameSchema.safeParse("player_123").success, true);
+  expect(usernameSchema.safeParse("player_123").success).toBe(true);
 });
 
-void test("content focus accepts exactly one supported preference", () => {
+test("content focus accepts exactly one supported preference", () => {
   for (const value of ["GAMES", "SCREEN", "BOTH"]) {
-    assert.equal(contentFocusSchema.parse(value), value);
+    expect(contentFocusSchema.parse(value)).toBe(value);
   }
-  assert.equal(contentFocusSchema.safeParse("MOVIES").success, false);
-  assert.equal(
-    contentFocusSchema.safeParse(["GAMES", "SCREEN"]).success,
-    false,
-  );
+  expect(contentFocusSchema.safeParse("MOVIES").success).toBe(false);
+  expect(contentFocusSchema.safeParse(["GAMES", "SCREEN"]).success).toBe(false);
 });
 
-void test("profile input validates identity and the selected focus", () => {
+test("profile input validates identity and the selected focus", () => {
   const result = profileInputSchema.parse({
     username: "  Player_123 ",
     displayName: " Player ",
     contentFocus: "BOTH",
   });
-  assert.equal(result.username, "player_123");
-  assert.equal(result.displayName, "Player");
-  assert.equal(result.contentFocus, "BOTH");
+  expect(result.username).toBe("player_123");
+  expect(result.displayName).toBe("Player");
+  expect(result.contentFocus).toBe("BOTH");
 });

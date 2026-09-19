@@ -1,32 +1,26 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import { getPostAuthDestination } from "./onboarding.ts";
 
-void test("incomplete accounts enter onboarding with a safe return URL", () => {
-  assert.equal(
-    getPostAuthDestination(null, "/game/example?tab=reviews"),
+test("incomplete accounts enter onboarding with a safe return URL", () => {
+  expect(getPostAuthDestination(null, "/game/example?tab=reviews")).toBe(
     "/onboarding?callbackUrl=%2Fgame%2Fexample%3Ftab%3Dreviews",
   );
-  assert.equal(
-    getPostAuthDestination(null, "https://evil.example"),
+  expect(getPostAuthDestination(null, "https://evil.example")).toBe(
     "/onboarding?callbackUrl=%2Fsettings%2Fprofile",
   );
-  assert.equal(getPostAuthDestination(null, "/onboarding"), "/onboarding");
+  expect(getPostAuthDestination(null, "/onboarding")).toBe("/onboarding");
 });
 
-void test("completed accounts bypass onboarding and retain safe callbacks", () => {
+test("completed accounts bypass onboarding and retain safe callbacks", () => {
   const completedAt = new Date();
-  assert.equal(
-    getPostAuthDestination(completedAt, "/game/example"),
+  expect(getPostAuthDestination(completedAt, "/game/example")).toBe(
     "/game/example",
   );
-  assert.equal(
-    getPostAuthDestination(completedAt, "/onboarding"),
+  expect(getPostAuthDestination(completedAt, "/onboarding")).toBe(
     "/settings/profile",
   );
-  assert.equal(
-    getPostAuthDestination(completedAt, "//evil.example"),
+  expect(getPostAuthDestination(completedAt, "//evil.example")).toBe(
     "/settings/profile",
   );
 });

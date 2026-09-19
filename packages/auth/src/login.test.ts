@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   authenticatePasswordUser,
@@ -18,33 +17,31 @@ const verifiedUser = {
   username: "town_user",
 };
 
-void test("login input normalizes an email or username", () => {
+test("login input normalizes an email or username", () => {
   const result = loginSchema.parse({
     identifier: "  Town_User  ",
     password: "password",
   });
 
-  assert.equal(result.identifier, "town_user");
+  expect(result.identifier).toBe("town_user");
 });
 
-void test("email login accepts normalized email and rejects usernames", () => {
-  assert.deepEqual(
+test("email login accepts normalized email and rejects usernames", () => {
+  expect(
     emailPasswordLoginSchema.parse({
       email: "  Staff@Example.com  ",
       password: "password",
     }),
-    { email: "staff@example.com", password: "password" },
-  );
-  assert.equal(
+  ).toStrictEqual({ email: "staff@example.com", password: "password" });
+  expect(
     emailPasswordLoginSchema.safeParse({
       email: "staff_username",
       password: "password",
     }).success,
-    false,
-  );
+  ).toBe(false);
 });
 
-void test("authenticates a verified user with a valid password", async () => {
+test("authenticates a verified user with a valid password", async () => {
   const result = await authenticatePasswordUser(
     { identifier: "town_user", password: "correct-password" },
     {
@@ -56,14 +53,14 @@ void test("authenticates a verified user with a valid password", async () => {
     },
   );
 
-  assert.equal(result.status, "authenticated");
+  expect(result.status).toBe("authenticated");
   if (result.status === "authenticated") {
-    assert.equal(result.user.id, verifiedUser.id);
-    assert.equal("passwordHash" in result.user, false);
+    expect(result.user.id).toBe(verifiedUser.id);
+    expect("passwordHash" in result.user).toBe(false);
   }
 });
 
-void test("an existing password-based staff account remains admin eligible", async () => {
+test("an existing password-based staff account remains admin eligible", async () => {
   const result = await authenticatePasswordUser(
     { identifier: "user@example.com", password: "correct-password" },
     {
@@ -72,16 +69,15 @@ void test("an existing password-based staff account remains admin eligible", asy
     },
   );
 
-  assert.equal(result.status, "authenticated");
+  expect(result.status).toBe("authenticated");
   if (result.status === "authenticated") {
-    assert.equal(
+    expect(
       resolveStaffAccess({ ...result.user, roles: ["ADMIN"] }).status,
-      "authorized",
-    );
+    ).toBe("authorized");
   }
 });
 
-void test("rejects an invalid password with the generic invalid result", async () => {
+test("rejects an invalid password with the generic invalid result", async () => {
   const result = await authenticatePasswordUser(
     { identifier: "town_user", password: "wrong-password" },
     {
@@ -90,10 +86,10 @@ void test("rejects an invalid password with the generic invalid result", async (
     },
   );
 
-  assert.deepEqual(result, { status: "invalid" });
+  expect(result).toStrictEqual({ status: "invalid" });
 });
 
-void test("rejects an unknown user after performing a password check", async () => {
+test("rejects an unknown user after performing a password check", async () => {
   let passwordChecked = false;
   const result = await authenticatePasswordUser(
     { identifier: "unknown", password: "wrong-password" },
@@ -106,11 +102,11 @@ void test("rejects an unknown user after performing a password check", async () 
     },
   );
 
-  assert.equal(passwordChecked, true);
-  assert.deepEqual(result, { status: "invalid" });
+  expect(passwordChecked).toBe(true);
+  expect(result).toStrictEqual({ status: "invalid" });
 });
 
-void test("requires verification after the correct password", async () => {
+test("requires verification after the correct password", async () => {
   const result = await authenticatePasswordUser(
     { identifier: "town_user", password: "correct-password" },
     {
@@ -119,13 +115,13 @@ void test("requires verification after the correct password", async () => {
     },
   );
 
-  assert.deepEqual(result, {
+  expect(result).toStrictEqual({
     email: verifiedUser.email,
     status: "unverified",
   });
 });
 
-void test("blocks unavailable accounts after the correct password", async () => {
+test("blocks unavailable accounts after the correct password", async () => {
   const result = await authenticatePasswordUser(
     { identifier: "town_user", password: "correct-password" },
     {
@@ -134,5 +130,5 @@ void test("blocks unavailable accounts after the correct password", async () => 
     },
   );
 
-  assert.deepEqual(result, { status: "unavailable" });
+  expect(result).toStrictEqual({ status: "unavailable" });
 });

@@ -7,7 +7,7 @@
   "scripts": {
     "bootstrap:owner": "node --env-file=../../.env --import tsx src/bootstrap-owner-cli.ts",
     "lint": "eslint .",
-    "test": "tsx --test src/**/*.test.ts",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "exports": {
@@ -45,6 +45,7 @@
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "tsx": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
