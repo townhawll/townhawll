@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { authenticatePasswordUser, loginSchema } from "./login.ts";
+import {
+  authenticatePasswordUser,
+  emailPasswordLoginSchema,
+  loginSchema,
+} from "./login.ts";
+import { resolveStaffAccess } from "./staff-context.ts";
 
 const verifiedUser = {
   email: "user@example.com",
@@ -22,6 +27,23 @@ void test("login input normalizes an email or username", () => {
   assert.equal(result.identifier, "town_user");
 });
 
+void test("email login accepts normalized email and rejects usernames", () => {
+  assert.deepEqual(
+    emailPasswordLoginSchema.parse({
+      email: "  Staff@Example.com  ",
+      password: "password",
+    }),
+    { email: "staff@example.com", password: "password" },
+  );
+  assert.equal(
+    emailPasswordLoginSchema.safeParse({
+      email: "staff_username",
+      password: "password",
+    }).success,
+    false,
+  );
+});
+
 void test("authenticates a verified user with a valid password", async () => {
   const result = await authenticatePasswordUser(
     { identifier: "town_user", password: "correct-password" },
@@ -38,6 +60,24 @@ void test("authenticates a verified user with a valid password", async () => {
   if (result.status === "authenticated") {
     assert.equal(result.user.id, verifiedUser.id);
     assert.equal("passwordHash" in result.user, false);
+  }
+});
+
+void test("an existing password-based staff account remains admin eligible", async () => {
+  const result = await authenticatePasswordUser(
+    { identifier: "user@example.com", password: "correct-password" },
+    {
+      findUser: () => Promise.resolve(verifiedUser),
+      verify: () => Promise.resolve(true),
+    },
+  );
+
+  assert.equal(result.status, "authenticated");
+  if (result.status === "authenticated") {
+    assert.equal(
+      resolveStaffAccess({ ...result.user, roles: ["ADMIN"] }).status,
+      "authorized",
+    );
   }
 });
 

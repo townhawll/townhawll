@@ -21,6 +21,18 @@ export const loginSchema = z.object({
     .max(128, "Password must contain at most 128 characters."),
 });
 
+export const emailPasswordLoginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email("Enter a valid email address.")
+    .max(254, "Enter a valid email address.")
+    .transform((value) => value.normalize("NFKC").toLowerCase()),
+  password: loginSchema.shape.password,
+});
+
+export type EmailPasswordLoginInput = z.infer<typeof emailPasswordLoginSchema>;
+
 export type LoginInput = z.infer<typeof loginSchema>;
 
 interface PasswordUser {

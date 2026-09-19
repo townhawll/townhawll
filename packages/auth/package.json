@@ -5,6 +5,7 @@
   "type": "module",
   "license": "UNLICENSED",
   "scripts": {
+    "bootstrap:owner": "node --env-file=../../.env --import tsx src/bootstrap-owner-cli.ts",
     "lint": "eslint .",
     "test": "tsx --test src/**/*.test.ts",
     "typecheck": "tsc --noEmit"
@@ -12,14 +13,19 @@
   "exports": {
     ".": "./src/index.ts",
     "./account": "./src/account.ts",
+    "./cookies": "./src/cookies.ts",
     "./guards": "./src/guards.ts",
     "./google": "./src/google.ts",
     "./login": "./src/login.ts",
     "./onboarding": "./src/onboarding.ts",
     "./password": "./src/password.ts",
     "./password-reset": "./src/password-reset.ts",
+    "./permissions": "./src/permissions.ts",
     "./redirects": "./src/redirects.ts",
     "./signup": "./src/signup.ts",
+    "./staff": "./src/staff.ts",
+    "./staff-context": "./src/staff-context.ts",
+    "./staff-management": "./src/staff-management.ts",
     "./session": "./src/session.ts",
     "./tokens": "./src/tokens.ts"
   },

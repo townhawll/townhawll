@@ -52,6 +52,18 @@ data and containers:
 Both reset commands are destructive and are intended only for local development.
 Prisma Studio is available with pnpm db:studio.
 
+## First development owner
+
+After creating and verifying a normal local user account, assign the first
+development OWNER with:
+
+    pnpm staff:bootstrap-owner -- owner@example.com
+
+The command is disabled when `NODE_ENV=production`, requires an existing
+verified active account, and refuses to run after an OWNER assignment exists.
+Additional staff-role changes must go through future authorized staff-management
+operations; there is no public staff signup route.
+
 ## Object storage
 
 Development uses the local storage driver by default. Uploaded objects are kept

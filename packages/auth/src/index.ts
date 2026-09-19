@@ -14,14 +14,38 @@ export {
 } from "./guards.ts";
 export {
   allowGoogleOAuthStart,
+  createExistingUserOnlyGoogleAuthAdapter,
   createGoogleAuthAdapter,
+  getAdminGoogleSignInDecision,
   getGoogleSignInDecision,
   GOOGLE_PROVIDER_ID,
   markGoogleUserVerified,
   parseVerifiedGoogleProfile,
   type GoogleSignInDecision,
+  type AdminGoogleSignInDecision,
 } from "./google.ts";
 export { hashPassword, verifyPassword } from "./password.ts";
+export {
+  ALL_PERMISSIONS,
+  ALL_STAFF_ROLES,
+  getEffectivePermissions,
+  hasAllPermissions,
+  hasAnyPermission,
+  hasPermission,
+  isStaff,
+  OwnerRequiredError,
+  PERMISSION,
+  PermissionRequiredError,
+  requireAllPermissions,
+  requireAnyPermission,
+  requireOwner,
+  requirePermission,
+  requireStaff,
+  ROLE_PERMISSIONS,
+  StaffRequiredError,
+  type Permission,
+  type StaffAuthorization,
+} from "./permissions.ts";
 export {
   allowPasswordResetAttempt,
   allowPasswordResetRequest,
@@ -38,7 +62,9 @@ export {
 export {
   allowLogin,
   authenticatePasswordUser,
+  emailPasswordLoginSchema,
   loginSchema,
+  type EmailPasswordLoginInput,
   type LoginInput,
   type PasswordAuthenticationResult,
 } from "./login.ts";
@@ -48,14 +74,18 @@ export {
   getSafeCallbackUrl,
 } from "./redirects.ts";
 export {
+  getAuthSessionCookieName,
+  getAuthSessionCookieOptions,
+} from "./cookies.ts";
+export {
   AUTH_SESSION_MAX_AGE_SECONDS,
+  createAdminAuthConfig,
   createAuthConfig,
   createDatabaseSession,
   createSessionRecord,
   createTownHawllAuth,
+  createTownHawllAdminAuth,
   endDatabaseSession,
-  getAuthSessionCookieName,
-  getAuthSessionCookieOptions,
 } from "./session.ts";
 export {
   allowSignup,
@@ -74,3 +104,17 @@ export {
   hashAuthToken,
   type AuthTokenPair,
 } from "./tokens.ts";
+export {
+  canAssignRole,
+  canManageStaff,
+  canRemoveRole,
+} from "./staff-management.ts";
+export { getStaffRoles } from "./staff.ts";
+export {
+  getStaffAccessBySessionToken,
+  resolveStaffAccess,
+  type SessionIdentity,
+  type StaffAccessState,
+  type StaffContext,
+} from "./staff-context.ts";
+export type { StaffRole } from "@townhawll/db";

@@ -3,7 +3,9 @@ import test from "node:test";
 import type { Adapter, AdapterUser } from "next-auth/adapters";
 
 import {
+  createExistingUserOnlyGoogleAuthAdapter,
   createGoogleAuthAdapter,
+  getAdminGoogleSignInDecision,
   getGoogleSignInDecision,
   parseVerifiedGoogleProfile,
 } from "./google.ts";
@@ -30,6 +32,28 @@ function createRepository(input?: {
         input?.accountStatus
           ? { id: "google-user", status: input.accountStatus }
           : null,
+      ),
+  };
+}
+
+function createAdminRepository(input?: {
+  account?: {
+    roles: ("ADMIN" | "MODERATOR" | "OWNER")[];
+    status: "ACTIVE" | "BANNED" | "DELETED" | "RESTRICTED" | "SUSPENDED";
+  };
+  email?: {
+    roles: ("ADMIN" | "MODERATOR" | "OWNER")[];
+    status: "ACTIVE" | "BANNED" | "DELETED" | "RESTRICTED" | "SUSPENDED";
+  };
+}) {
+  return {
+    findByEmail: () =>
+      Promise.resolve(
+        input?.email ? { id: "email-user", ...input.email } : null,
+      ),
+    findByProviderAccountId: () =>
+      Promise.resolve(
+        input?.account ? { id: "google-user", ...input.account } : null,
       ),
   };
 }
@@ -84,6 +108,98 @@ void test("rejects Google sign-in for unavailable accounts", async () => {
     ),
     { allowed: false },
   );
+});
+
+void test("admin Google login allows an existing active staff account", async () => {
+  assert.deepEqual(
+    await getAdminGoogleSignInDecision(
+      { profile: verifiedProfile, providerAccountId: verifiedProfile.sub },
+      {
+        repository: createAdminRepository({
+          account: { roles: ["ADMIN"], status: "ACTIVE" },
+        }),
+      },
+    ),
+    {
+      access: "staff",
+      allowed: true,
+      flow: "returning",
+      userId: "google-user",
+    },
+  );
+});
+
+void test("admin Google login never accepts an unknown TownHawll user", async () => {
+  assert.deepEqual(
+    await getAdminGoogleSignInDecision(
+      { profile: verifiedProfile, providerAccountId: verifiedProfile.sub },
+      { repository: createAdminRepository() },
+    ),
+    { allowed: false },
+  );
+});
+
+void test("admin Google login identifies an existing non-staff account", async () => {
+  assert.deepEqual(
+    await getAdminGoogleSignInDecision(
+      { profile: verifiedProfile, providerAccountId: verifiedProfile.sub },
+      {
+        repository: createAdminRepository({
+          email: { roles: [], status: "ACTIVE" },
+        }),
+      },
+    ),
+    {
+      access: "non-staff",
+      allowed: true,
+      flow: "link",
+      userId: "email-user",
+    },
+  );
+});
+
+void test("admin Google login rejects every inactive account state", async () => {
+  for (const status of [
+    "RESTRICTED",
+    "SUSPENDED",
+    "BANNED",
+    "DELETED",
+  ] as const) {
+    assert.deepEqual(
+      await getAdminGoogleSignInDecision(
+        { profile: verifiedProfile, providerAccountId: verifiedProfile.sub },
+        {
+          repository: createAdminRepository({
+            account: { roles: ["OWNER"], status },
+          }),
+        },
+      ),
+      { allowed: false },
+    );
+  }
+});
+
+void test("the admin Google adapter cannot create users or assign roles", () => {
+  let delegatedCreation = false;
+  const adapter = createExistingUserOnlyGoogleAuthAdapter({
+    createUser(user) {
+      delegatedCreation = true;
+      return Promise.resolve(user);
+    },
+  });
+
+  if (!adapter.createUser) assert.fail("Expected createUser adapter method.");
+  assert.throws(() =>
+    adapter.createUser!({
+      email: "unknown@gmail.com",
+      emailVerified: null,
+      id: "new-user",
+      image: null,
+      name: "Unknown",
+      status: "ACTIVE",
+    }),
+  );
+  assert.equal(delegatedCreation, false);
 });
 
 void test("marks users created through the Google adapter as verified", async () => {

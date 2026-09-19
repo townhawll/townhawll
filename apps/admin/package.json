@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "@townhawll/admin",
   "version": "0.0.0",
   "private": true,
@@ -8,10 +9,12 @@
     "dev": "next dev --port 3001",
     "lint": "eslint .",
     "start": "next start --port 3001",
+    "test": "tsx --test src/**/*.test.ts",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@sentry/nextjs": "catalog:",
+    "@townhawll/auth": "workspace:*",
     "@townhawll/config": "workspace:*",
     "@townhawll/observability": "workspace:*",
     "@townhawll/ui": "workspace:*",
@@ -28,6 +31,7 @@
     "@types/react-dom": "catalog:",
     "eslint": "catalog:",
     "postcss": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:"
   }
 }

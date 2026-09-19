@@ -7,33 +7,22 @@ import type { Adapter } from "next-auth/adapters";
 import Google from "next-auth/providers/google";
 
 import {
+  createExistingUserOnlyGoogleAuthAdapter,
   createGoogleAuthAdapter,
+  getAdminGoogleSignInDecision,
   getGoogleSignInDecision,
   GOOGLE_PROVIDER_ID,
   markGoogleUserVerified,
 } from "./google.ts";
+import {
+  getAuthSessionCookieName,
+  getAuthSessionCookieOptions,
+} from "./cookies.ts";
 import "./types.ts";
 
 export const AUTH_SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
-export function getAuthSessionCookieName(
-  environment = process.env.NODE_ENV,
-): string {
-  return environment === "production"
-    ? "__Secure-authjs.session-token"
-    : "authjs.session-token";
-}
-
-export function getAuthSessionCookieOptions(
-  environment = process.env.NODE_ENV,
-) {
-  return {
-    httpOnly: true,
-    path: "/" as const,
-    sameSite: "lax" as const,
-    secure: environment === "production",
-  };
-}
+export { getAuthSessionCookieName, getAuthSessionCookieOptions };
 
 export function createSessionRecord(userId: string, now = new Date()) {
   return {
@@ -74,28 +63,43 @@ export async function endDatabaseSession(
 }
 
 export async function createAuthConfig(): Promise<NextAuthConfig> {
+  return createApplicationAuthConfig("web");
+}
+
+export async function createAdminAuthConfig(): Promise<NextAuthConfig> {
+  return createApplicationAuthConfig("admin");
+}
+
+async function createApplicationAuthConfig(
+  application: "admin" | "web",
+): Promise<NextAuthConfig> {
   const environment = loadAuthEnvironment();
   const { db } = await import("@townhawll/db");
+  const prismaAdapter = PrismaAdapter(db);
+  const adapter =
+    application === "admin"
+      ? createExistingUserOnlyGoogleAuthAdapter(prismaAdapter)
+      : createGoogleAuthAdapter({
+          ...prismaAdapter,
+          createUser: (user) =>
+            db.user.create({
+              data: {
+                email: user.email,
+                emailVerified: user.emailVerified,
+                name: user.name ?? null,
+                image: user.image ?? null,
+                profile: {
+                  create: {
+                    displayName: user.name ?? null,
+                    avatarUrl: user.image ?? null,
+                  },
+                },
+              },
+            }),
+        } satisfies Adapter);
 
   return {
-    adapter: createGoogleAuthAdapter({
-      ...PrismaAdapter(db),
-      createUser: (user) =>
-        db.user.create({
-          data: {
-            email: user.email,
-            emailVerified: user.emailVerified,
-            name: user.name ?? null,
-            image: user.image ?? null,
-            profile: {
-              create: {
-                displayName: user.name ?? null,
-                avatarUrl: user.image ?? null,
-              },
-            },
-          },
-        }),
-    } satisfies Adapter),
+    adapter,
     cookies: {
       sessionToken: {
         name: getAuthSessionCookieName(),
@@ -106,10 +110,16 @@ export async function createAuthConfig(): Promise<NextAuthConfig> {
       async signIn({ account, profile }) {
         if (account?.provider !== GOOGLE_PROVIDER_ID) return false;
 
-        const decision = await getGoogleSignInDecision({
-          profile,
-          providerAccountId: account.providerAccountId,
-        });
+        const decision =
+          application === "admin"
+            ? await getAdminGoogleSignInDecision({
+                profile,
+                providerAccountId: account.providerAccountId,
+              })
+            : await getGoogleSignInDecision({
+                profile,
+                providerAccountId: account.providerAccountId,
+              });
         return decision.allowed;
       },
       async session({ session, user }) {
@@ -132,7 +142,10 @@ export async function createAuthConfig(): Promise<NextAuthConfig> {
         }
       },
     },
-    pages: { error: "/login", newUser: "/onboarding", signIn: "/login" },
+    pages:
+      application === "admin"
+        ? { error: "/login", signIn: "/login" }
+        : { error: "/login", newUser: "/onboarding", signIn: "/login" },
     providers: [
       Google({
         allowDangerousEmailAccountLinking: true,
@@ -150,4 +163,8 @@ export async function createAuthConfig(): Promise<NextAuthConfig> {
 
 export function createTownHawllAuth() {
   return NextAuth(createAuthConfig);
+}
+
+export function createTownHawllAdminAuth() {
+  return NextAuth(createAdminAuthConfig);
 }

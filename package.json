@@ -16,7 +16,8 @@
     "db:migrate": "pnpm --filter @townhawll/db db:migrate",
     "db:reset": "pnpm --filter @townhawll/db db:reset",
     "db:studio": "pnpm --filter @townhawll/db db:studio",
-    "db:smoke": "pnpm --filter @townhawll/db db:smoke"
+    "db:smoke": "pnpm --filter @townhawll/db db:smoke",
+    "staff:bootstrap-owner": "pnpm --filter @townhawll/auth bootstrap:owner"
   },
   "devDependencies": {
     "prettier": "catalog:",
