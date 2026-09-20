@@ -10,6 +10,7 @@ import {
   hasPermission,
   isStaff,
   OwnerRequiredError,
+  parseStaffRole,
   PERMISSION,
   PermissionRequiredError,
   requireAllPermissions,
@@ -107,6 +108,12 @@ test("multiple roles form a deduplicated permission union", () => {
 test("a user with no roles is not staff", () => {
   expect(isStaff([])).toBe(false);
   expect(() => requireStaff([])).toThrow(StaffRequiredError);
+});
+
+test("runtime staff-role validation accepts only defined Prisma roles", () => {
+  expect(parseStaffRole("MODERATOR")).toBe("MODERATOR");
+  expect(() => parseStaffRole("SUPER_ADMIN")).toThrow();
+  expect(() => parseStaffRole({ role: "OWNER" })).toThrow();
 });
 
 test("permission and owner guards fail closed", () => {

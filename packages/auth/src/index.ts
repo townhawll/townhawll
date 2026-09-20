@@ -34,6 +34,7 @@ export {
   hasPermission,
   isStaff,
   OwnerRequiredError,
+  parseStaffRole,
   PERMISSION,
   PermissionRequiredError,
   requireAllPermissions,
@@ -43,6 +44,7 @@ export {
   requireStaff,
   ROLE_PERMISSIONS,
   StaffRequiredError,
+  staffRoleSchema,
   type Permission,
   type StaffAuthorization,
 } from "./permissions.ts";

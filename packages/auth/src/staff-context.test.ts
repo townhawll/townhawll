@@ -17,6 +17,7 @@ function identity(overrides: Partial<SessionIdentity> = {}): SessionIdentity {
     name: "Staff User",
     roles: ["CONTENT_EDITOR"],
     status: "ACTIVE",
+    username: "staff_user",
     ...overrides,
   };
 }
@@ -26,6 +27,7 @@ test("a valid user with one role resolves to current staff", () => {
   expect(state.status).toBe("authorized");
   if (state.status === "authorized") {
     expect(state.staff.roles).toStrictEqual(["CONTENT_EDITOR"]);
+    expect(state.staff.username).toBe("staff_user");
     expect(state.staff.permissions.has(PERMISSION.CONTENT_PUBLISH)).toBe(true);
   }
 });
@@ -96,14 +98,18 @@ test("missing and expired sessions are unauthenticated", async () => {
 });
 
 test("session lookup evaluates fresh staff roles", async () => {
-  const state = await getStaffAccessBySessionToken("valid-token", {
-    deleteExpiredSession: () => Promise.resolve(),
-    findSession: () =>
-      Promise.resolve({
-        expires: new Date("2026-09-20T00:00:00.000Z"),
-        user: identity({ roles: ["OWNER"] }),
-      }),
-  });
+  const state = await getStaffAccessBySessionToken(
+    "valid-token",
+    {
+      deleteExpiredSession: () => Promise.resolve(),
+      findSession: () =>
+        Promise.resolve({
+          expires: new Date("2026-09-20T00:00:00.000Z"),
+          user: identity({ roles: ["OWNER"] }),
+        }),
+    },
+    new Date("2026-09-19T12:00:00.000Z"),
+  );
 
   expect(state.status).toBe("authorized");
   if (state.status === "authorized") {

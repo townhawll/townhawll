@@ -24,6 +24,7 @@ const authorized = {
     permissions: new Set(),
     roles: ["CONTENT_EDITOR"],
     userId: "user_1",
+    username: "staff_user",
   },
 } satisfies StaffAccessState;
 

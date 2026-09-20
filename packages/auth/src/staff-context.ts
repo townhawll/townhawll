@@ -9,6 +9,7 @@ export interface SessionIdentity {
   name: string | null;
   roles: StaffRole[];
   status: AccountStatus;
+  username: string | null;
 }
 
 export interface StaffContext {
@@ -18,6 +19,7 @@ export interface StaffContext {
   permissions: ReadonlySet<Permission>;
   roles: readonly StaffRole[];
   userId: string;
+  username: string | null;
 }
 
 export type StaffAccessState =
@@ -52,6 +54,7 @@ const defaultSessionLookupDependencies: SessionLookupDependencies = {
             emailVerified: true,
             id: true,
             name: true,
+            profile: { select: { username: true } },
             status: true,
             staffRoleAssignments: {
               orderBy: { assignedAt: "asc" },
@@ -73,6 +76,7 @@ const defaultSessionLookupDependencies: SessionLookupDependencies = {
         name: session.user.name,
         roles: session.user.staffRoleAssignments.map(({ role }) => role),
         status: session.user.status,
+        username: session.user.profile?.username ?? null,
       },
     };
   },
@@ -102,6 +106,7 @@ export function resolveStaffAccess(
       permissions: getEffectivePermissions(roles),
       roles,
       userId: identity.id,
+      username: identity.username,
     },
   };
 }

@@ -15,6 +15,7 @@ import {
 import { getAuthSessionCookieName } from "@townhawll/auth/cookies";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 function getLoginDestination(callbackUrl: string): string {
   const loginUrl = new URL("https://townhawll.invalid/login");
@@ -22,12 +23,14 @@ function getLoginDestination(callbackUrl: string): string {
   return `${loginUrl.pathname}${loginUrl.search}`;
 }
 
-export async function getCurrentStaffState(): Promise<StaffAccessState> {
-  const cookieStore = await cookies();
-  return getStaffAccessBySessionToken(
-    cookieStore.get(getAuthSessionCookieName())?.value,
-  );
-}
+export const getCurrentStaffState = cache(
+  async (): Promise<StaffAccessState> => {
+    const cookieStore = await cookies();
+    return getStaffAccessBySessionToken(
+      cookieStore.get(getAuthSessionCookieName())?.value,
+    );
+  },
+);
 
 export async function getCurrentStaff(): Promise<StaffContext | null> {
   const state = await getCurrentStaffState();

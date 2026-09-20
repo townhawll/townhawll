@@ -43,7 +43,7 @@ const authEnvironmentSchema = z.object({
     .min(32, "AUTH_SECRET must contain at least 32 characters."),
 });
 
-const emailEnvironmentSchema = z.object({
+const appEnvironmentSchema = z.object({
   APP_URL: z
     .string()
     .url()
@@ -51,6 +51,9 @@ const emailEnvironmentSchema = z.object({
       (value) => value.startsWith("http://") || value.startsWith("https://"),
       "APP_URL must use the http:// or https:// protocol.",
     ),
+});
+
+const emailEnvironmentSchema = appEnvironmentSchema.extend({
   EMAIL_FROM: z.string().trim().min(1, "EMAIL_FROM is required."),
   RESEND_API_KEY: z.string().trim().min(1, "RESEND_API_KEY is required."),
 });
@@ -136,6 +139,18 @@ export function loadEmailEnvironment(
   environment: NodeJS.ProcessEnv = process.env,
 ) {
   const result = emailEnvironmentSchema.safeParse(environment);
+
+  if (!result.success) {
+    throw invalidEnvironment(result.error);
+  }
+
+  return result.data;
+}
+
+export function loadAppEnvironment(
+  environment: NodeJS.ProcessEnv = process.env,
+) {
+  const result = appEnvironmentSchema.safeParse(environment);
 
   if (!result.success) {
     throw invalidEnvironment(result.error);
@@ -245,6 +260,7 @@ export function loadAdminSentryEnvironment(
 }
 
 export type DbEnvironment = z.infer<typeof dbEnvironmentSchema>;
+export type AppEnvironment = z.infer<typeof appEnvironmentSchema>;
 export type RedisEnvironment = z.infer<typeof redisEnvironmentSchema>;
 export type AuthEnvironment = z.infer<typeof authEnvironmentSchema>;
 export type EmailEnvironment = z.infer<typeof emailEnvironmentSchema>;

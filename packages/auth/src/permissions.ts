@@ -1,4 +1,5 @@
 import type { StaffRole } from "@townhawll/db";
+import { z } from "zod";
 
 export const PERMISSION = {
   CONTENT_READ: "content.read",
@@ -52,6 +53,17 @@ export const ALL_STAFF_ROLES = [
   "TECHNICAL_ADMIN",
   "OWNER",
 ] as const satisfies readonly StaffRole[];
+
+type MissingStaffRole = Exclude<StaffRole, (typeof ALL_STAFF_ROLES)[number]>;
+const allStaffRolesAreListed: MissingStaffRole extends never ? true : never =
+  true;
+void allStaffRolesAreListed;
+
+export const staffRoleSchema = z.enum(ALL_STAFF_ROLES);
+
+export function parseStaffRole(value: unknown): StaffRole {
+  return staffRoleSchema.parse(value);
+}
 
 export const ROLE_PERMISSIONS = {
   CONTENT_EDITOR: [

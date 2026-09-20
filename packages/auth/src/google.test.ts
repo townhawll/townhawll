@@ -122,6 +122,24 @@ test("admin Google login allows an existing active staff account", async () => {
   });
 });
 
+test("admin Google login safely links an existing active staff email", async () => {
+  expect(
+    await getAdminGoogleSignInDecision(
+      { profile: verifiedProfile, providerAccountId: verifiedProfile.sub },
+      {
+        repository: createAdminRepository({
+          email: { roles: ["MODERATOR"], status: "ACTIVE" },
+        }),
+      },
+    ),
+  ).toStrictEqual({
+    access: "staff",
+    allowed: true,
+    flow: "link",
+    userId: "email-user",
+  });
+});
+
 test("admin Google login never accepts an unknown TownHawll user", async () => {
   expect(
     await getAdminGoogleSignInDecision(

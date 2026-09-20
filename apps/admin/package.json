@@ -18,6 +18,7 @@
     "@townhawll/config": "workspace:*",
     "@townhawll/observability": "workspace:*",
     "@townhawll/ui": "workspace:*",
+    "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
