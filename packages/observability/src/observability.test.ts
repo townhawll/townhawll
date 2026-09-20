@@ -1,6 +1,5 @@
-import assert from "node:assert/strict";
 import { Writable } from "node:stream";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   parseAdminSentryDsn,
@@ -20,20 +19,19 @@ import {
   serializeSafeError,
 } from "@townhawll/observability/redact";
 
-void test("request IDs propagate only when they contain safe characters", () => {
-  assert.equal(
+test("request IDs propagate only when they contain safe characters", () => {
+  expect(
     getOrCreateRequestId(new Headers({ "x-request-id": "job_12345678" })),
-    "job_12345678",
-  );
+  ).toBe("job_12345678");
 
   const generated = getOrCreateRequestId(
     new Headers({ "x-request-id": "unsafe/payload" }),
   );
-  assert.match(generated, /^[0-9a-f-]{36}$/);
+  expect(generated).toMatch(/^[0-9a-f-]{36}$/);
 });
 
-void test("sensitive fields and error details are removed recursively", () => {
-  assert.deepEqual(
+test("sensitive fields and error details are removed recursively", () => {
+  expect(
     redactSensitiveFields({
       authorization: "Bearer secret",
       nested: {
@@ -45,22 +43,21 @@ void test("sensitive fields and error details are removed recursively", () => {
       url: "https://example.com/reset?token=secret",
       err: new Error("secret in message"),
     }),
-    {
-      authorization: "[Redacted]",
-      nested: {
-        password: "[Redacted]",
-        session_token: "[Redacted]",
-        safeId: "user_1",
-      },
-      request: "[Redacted]",
-      url: "[Redacted]",
-      err: { type: "Error" },
+  ).toStrictEqual({
+    authorization: "[Redacted]",
+    nested: {
+      password: "[Redacted]",
+      session_token: "[Redacted]",
+      safeId: "user_1",
     },
-  );
-  assert.deepEqual(serializeSafeError("secret"), { type: "UnknownError" });
+    request: "[Redacted]",
+    url: "[Redacted]",
+    err: { type: "Error" },
+  });
+  expect(serializeSafeError("secret")).toStrictEqual({ type: "UnknownError" });
 });
 
-void test("Pino writes structured JSON without credentials or raw error messages", () => {
+test("Pino writes structured JSON without credentials or raw error messages", () => {
   let output = "";
   const destination = new Writable({
     write(chunk: Buffer, _encoding, callback) {
@@ -78,13 +75,13 @@ void test("Pino writes structured JSON without credentials or raw error messages
   });
 
   const record = JSON.parse(output) as Record<string, unknown>;
-  assert.equal(record.service, "test");
-  assert.equal(record.event, "auth_failure");
-  assert.equal(record.level, 50);
-  assert.equal(record.password, "[Redacted]");
-  assert.equal(record.headers, "[Redacted]");
-  assert.deepEqual(record.err, { type: "Error" });
-  assert.doesNotMatch(output, /private-/);
+  expect(record.service).toBe("test");
+  expect(record.event).toBe("auth_failure");
+  expect(record.level).toBe(50);
+  expect(record.password).toBe("[Redacted]");
+  expect(record.headers).toBe("[Redacted]");
+  expect(record.err).toStrictEqual({ type: "Error" });
+  expect(output).not.toMatch(/private-/);
 
   logger
     .child({ sessionToken: "private-child" })
@@ -93,48 +90,48 @@ void test("Pino writes structured JSON without credentials or raw error messages
     string,
     unknown
   >;
-  assert.equal(childRecord.sessionToken, "[Redacted]");
-  assert.doesNotMatch(output, /private-child/);
+  expect(childRecord.sessionToken).toBe("[Redacted]");
+  expect(output).not.toMatch(/private-child/);
 });
 
-void test("observability env defaults safely and rejects invalid values", () => {
-  assert.equal(loadObservabilityEnvironment({}).LOG_LEVEL, "info");
-  assert.equal(parseWebSentryDsn(undefined), undefined);
-  assert.equal(parseAdminSentryDsn(""), undefined);
-  assert.throws(() => parseWebSentryDsn("invalid"));
-  assert.throws(() => parseAdminSentryDsn("javascript:alert(1)"));
-  assert.throws(() => loadObservabilityEnvironment({ LOG_LEVEL: "verbose" }));
+test("observability env defaults safely and rejects invalid values", () => {
+  expect(loadObservabilityEnvironment({}).LOG_LEVEL).toBe("info");
+  expect(parseWebSentryDsn(undefined)).toBe(undefined);
+  expect(parseAdminSentryDsn("")).toBe(undefined);
+  expect(() => parseWebSentryDsn("invalid")).toThrow();
+  expect(() => parseAdminSentryDsn("javascript:alert(1)")).toThrow();
+  expect(() =>
+    loadObservabilityEnvironment({ LOG_LEVEL: "verbose" }),
+  ).toThrow();
 });
 
-void test("each app validates only its own optional Sentry DSN", () => {
+test("each app validates only its own optional Sentry DSN", () => {
   const webDsn = "https://public@example.invalid/1";
   const adminDsn = "https://public@example.invalid/2";
 
-  assert.equal(
+  expect(
     loadWebSentryEnvironment({
       NEXT_PUBLIC_SENTRY_DSN_WEB: webDsn,
       NEXT_PUBLIC_SENTRY_DSN_ADMIN: "invalid",
     }).sentryDsn,
-    webDsn,
-  );
-  assert.equal(
+  ).toBe(webDsn);
+  expect(
     loadAdminSentryEnvironment({
       NEXT_PUBLIC_SENTRY_DSN_WEB: "invalid",
       NEXT_PUBLIC_SENTRY_DSN_ADMIN: adminDsn,
     }).sentryDsn,
-    adminDsn,
-  );
-  assert.equal(loadWebSentryEnvironment({}).sentryDsn, undefined);
-  assert.equal(loadAdminSentryEnvironment({}).sentryDsn, undefined);
-  assert.throws(() =>
+  ).toBe(adminDsn);
+  expect(loadWebSentryEnvironment({}).sentryDsn).toBe(undefined);
+  expect(loadAdminSentryEnvironment({}).sentryDsn).toBe(undefined);
+  expect(() =>
     loadWebSentryEnvironment({ NEXT_PUBLIC_SENTRY_DSN_WEB: "invalid" }),
-  );
-  assert.throws(() =>
+  ).toThrow();
+  expect(() =>
     loadAdminSentryEnvironment({ NEXT_PUBLIC_SENTRY_DSN_ADMIN: "invalid" }),
-  );
+  ).toThrow();
 });
 
-void test("Sentry payloads omit request data and exception messages", () => {
+test("Sentry payloads omit request data and exception messages", () => {
   const event = redactSentryEvent({
     breadcrumbs: [{ message: "secret" }],
     exception: {
@@ -161,10 +158,10 @@ void test("Sentry payloads omit request data and exception messages", () => {
     user: { email: "private@example.com" },
   });
 
-  assert.equal("request" in event, false);
-  assert.equal("user" in event, false);
-  assert.equal("breadcrumbs" in event, false);
-  assert.deepEqual(event.exception.values, [
+  expect("request" in event).toBe(false);
+  expect("user" in event).toBe(false);
+  expect("breadcrumbs" in event).toBe(false);
+  expect(event.exception.values).toStrictEqual([
     {
       type: "Error",
       value: "Error",

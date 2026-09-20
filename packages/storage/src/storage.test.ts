@@ -1,8 +1,7 @@
-import assert from "node:assert/strict";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import { loadStorageEnvironment } from "@townhawll/config/server-env";
 
@@ -15,12 +14,11 @@ const png = Uint8Array.from([
   0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
 ]);
 
-void test("storage configuration selects local safely and requires complete R2 settings", () => {
-  assert.equal(
-    loadStorageEnvironment({ NODE_ENV: "development" }).driver,
+test("storage configuration selects local safely and requires complete R2 settings", () => {
+  expect(loadStorageEnvironment({ NODE_ENV: "development" }).driver).toBe(
     "local",
   );
-  assert.equal(
+  expect(
     loadStorageEnvironment({
       NODE_ENV: "development",
       R2_ACCOUNT_ID: "account",
@@ -29,52 +27,49 @@ void test("storage configuration selects local safely and requires complete R2 s
       R2_BUCKET_NAME: "bucket",
       R2_PUBLIC_URL: "https://media.example.com",
     }).driver,
-    "r2",
-  );
-  assert.throws(() => loadStorageEnvironment({ NODE_ENV: "production" }));
-  assert.throws(() =>
+  ).toBe("r2");
+  expect(() => loadStorageEnvironment({ NODE_ENV: "production" })).toThrow();
+  expect(() =>
     loadStorageEnvironment({
       NODE_ENV: "development",
       STORAGE_DRIVER: "r2",
       R2_ACCOUNT_ID: "partial",
     }),
-  );
+  ).toThrow();
 });
 
-void test("object keys are generated below a safe caller-owned prefix", () => {
+test("object keys are generated below a safe caller-owned prefix", () => {
   const key = createObjectKey({
     prefix: "users/user_1/avatar",
     extension: ".PNG",
   });
-  assert.match(key, /^users\/user_1\/avatar\/[0-9a-f-]+\.png$/);
-  assert.throws(() =>
+  expect(key).toMatch(/^users\/user_1\/avatar\/[0-9a-f-]+\.png$/);
+  expect(() =>
     createObjectKey({ prefix: "../unsafe", extension: "png" }),
-  );
-  assert.match(
+  ).toThrow();
+  expect(
     createObjectKey({
       prefix: `${"/".repeat(10_000)}users/user_1/avatar${"/".repeat(10_000)}`,
       extension: "png",
     }),
-    /^users\/user_1\/avatar\/[0-9a-f-]+\.png$/,
-  );
+  ).toMatch(/^users\/user_1\/avatar\/[0-9a-f-]+\.png$/);
 });
 
-void test("image validation trusts bytes rather than extensions or MIME alone", () => {
-  assert.equal(
+test("image validation trusts bytes rather than extensions or MIME alone", () => {
+  expect(
     validateImageBytes({ bytes: png, claimedContentType: "image/png" })
       .extension,
-    "png",
-  );
-  assert.throws(() =>
+  ).toBe("png");
+  expect(() =>
     validateImageBytes({ bytes: png, claimedContentType: "image/jpeg" }),
-  );
-  assert.throws(() => validateImageBytes({ bytes: Uint8Array.of() }));
-  assert.throws(() =>
+  ).toThrow();
+  expect(() => validateImageBytes({ bytes: Uint8Array.of() })).toThrow();
+  expect(() =>
     validateImageBytes({ bytes: new Uint8Array(AVATAR_MAX_BYTES + 1) }),
-  );
+  ).toThrow();
 });
 
-void test("local storage writes, reads, resolves, and deletes objects", async () => {
+test("local storage writes, reads, resolves, and deletes objects", async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), "townhawll-storage-"));
   try {
     const storage = await createLocalStorage({ rootDirectory: root });
@@ -85,16 +80,15 @@ void test("local storage writes, reads, resolves, and deletes objects", async ()
       contentType: "image/png",
       cacheControl: "public, max-age=60",
     });
-    assert.equal(uploaded.publicUrl, "/api/storage/tests/avatar/image.png");
-    assert.deepEqual(
-      await readFile(path.join(root, ...key.split("/"))),
+    expect(uploaded.publicUrl).toBe("/api/storage/tests/avatar/image.png");
+    expect(await readFile(path.join(root, ...key.split("/")))).toStrictEqual(
       Buffer.from(png),
     );
     const object = await storage.readObject?.(key);
-    assert.equal(object?.contentType, "image/png");
-    assert.deepEqual(Buffer.from(object?.body ?? []), Buffer.from(png));
+    expect(object?.contentType).toBe("image/png");
+    expect(Buffer.from(object?.body ?? [])).toStrictEqual(Buffer.from(png));
     await storage.deleteObject(key);
-    assert.equal(await storage.readObject?.(key), null);
+    expect(await storage.readObject?.(key)).toBe(null);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

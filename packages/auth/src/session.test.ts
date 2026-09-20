@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   AUTH_SESSION_MAX_AGE_SECONDS,
@@ -9,21 +8,20 @@ import {
   getAuthSessionCookieOptions,
 } from "./session.ts";
 
-void test("creates an opaque database session with the configured expiry", () => {
+test("creates an opaque database session with the configured expiry", () => {
   const now = new Date("2026-09-09T00:00:00.000Z");
   const first = createSessionRecord("user_1", now);
   const second = createSessionRecord("user_1", now);
 
-  assert.equal(first.userId, "user_1");
-  assert.equal(
-    first.expires.getTime(),
+  expect(first.userId).toBe("user_1");
+  expect(first.expires.getTime()).toBe(
     now.getTime() + AUTH_SESSION_MAX_AGE_SECONDS * 1_000,
   );
-  assert.notEqual(first.sessionToken, second.sessionToken);
-  assert.ok(first.sessionToken.length >= 40);
+  expect(first.sessionToken).not.toBe(second.sessionToken);
+  expect(first.sessionToken.length >= 40).toBeTruthy();
 });
 
-void test("logout invalidates the current database session", async () => {
+test("logout invalidates the current database session", async () => {
   let deletedToken: string | undefined;
   const ended = await endDatabaseSession("session-token", {
     deleteSession: (token) => {
@@ -32,21 +30,20 @@ void test("logout invalidates the current database session", async () => {
     },
   });
 
-  assert.equal(ended, true);
-  assert.equal(deletedToken, "session-token");
-  assert.equal(await endDatabaseSession(undefined), false);
+  expect(ended).toBe(true);
+  expect(deletedToken).toBe("session-token");
+  expect(await endDatabaseSession(undefined)).toBe(false);
 });
 
-void test("uses HTTP-only secure cookies in production", () => {
-  assert.equal(
-    getAuthSessionCookieName("production"),
+test("uses HTTP-only secure cookies in production", () => {
+  expect(getAuthSessionCookieName("production")).toBe(
     "__Secure-authjs.session-token",
   );
-  assert.deepEqual(getAuthSessionCookieOptions("production"), {
+  expect(getAuthSessionCookieOptions("production")).toStrictEqual({
     httpOnly: true,
     path: "/",
     sameSite: "lax",
     secure: true,
   });
-  assert.equal(getAuthSessionCookieOptions("development").secure, false);
+  expect(getAuthSessionCookieOptions("development").secure).toBe(false);
 });

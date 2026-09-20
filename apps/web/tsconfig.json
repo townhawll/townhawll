@@ -2,7 +2,10 @@
   "extends": "@townhawll/typescript-config/nextjs.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
-    "incremental": true
+    "incremental": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": [
     "next-env.d.ts",

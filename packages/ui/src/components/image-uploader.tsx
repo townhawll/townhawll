@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ImageIcon, LoaderCircle, Upload, X } from "lucide-react";
+import { CheckCircle2, LoaderCircle, Upload, X } from "lucide-react";
 import {
   type ChangeEvent,
   type DragEvent,
@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import { Button } from "./button";
+import { Avatar } from "./avatar";
 
 type UploadStatus = "idle" | "uploading" | "success" | "error";
 
@@ -140,21 +141,11 @@ export function ImageUploader({
     <div className="grid gap-2">
       <span className="text-sm font-medium text-foreground">{label}</span>
       <div className="flex items-stretch gap-3">
-        <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-lg border border-border-default bg-surface-2">
-          {imageUrl ? (
-            <img
-              alt="Avatar preview"
-              className="size-full object-cover"
-              src={imageUrl}
-            />
-          ) : (
-            <ImageIcon
-              aria-hidden="true"
-              className="text-foreground-muted"
-              size={24}
-            />
-          )}
-        </div>
+        <Avatar
+          alt="Avatar preview"
+          className="size-20 rounded-lg border border-border-default"
+          src={imageUrl}
+        />
         <label
           aria-disabled={busy}
           className={`flex min-h-20 flex-1 cursor-pointer items-center gap-3 rounded-lg border border-dashed px-4 py-3 transition-colors duration-fast focus-visible:outline-none ${

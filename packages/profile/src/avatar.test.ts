@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import type { ObjectStorage } from "@townhawll/storage";
 
@@ -15,21 +14,19 @@ const png = Uint8Array.from([
   0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
 ]);
 
-void test("profile avatars accept managed local paths and external HTTP URLs", () => {
-  assert.equal(
+test("profile avatars accept managed local paths and external HTTP URLs", () => {
+  expect(
     getProfileAvatarUrl("/api/storage/users/user_1/avatar/image.png"),
-    "/api/storage/users/user_1/avatar/image.png",
-  );
-  assert.equal(
-    getProfileAvatarUrl("https://images.example.com/avatar.png"),
+  ).toBe("/api/storage/users/user_1/avatar/image.png");
+  expect(getProfileAvatarUrl("https://images.example.com/avatar.png")).toBe(
     "https://images.example.com/avatar.png",
   );
-  assert.equal(getProfileAvatarUrl("javascript:alert(1)"), null);
-  assert.equal(getProfileAvatarUrl("/unexpected/local/path.png"), null);
-  assert.equal(getProfileAvatarUrl(null), null);
+  expect(getProfileAvatarUrl("javascript:alert(1)")).toBe(null);
+  expect(getProfileAvatarUrl("/unexpected/local/path.png")).toBe(null);
+  expect(getProfileAvatarUrl(null)).toBe(null);
 });
 
-void test("avatar replacement updates the profile before deleting the prior managed object", async () => {
+test("avatar replacement updates the profile before deleting the prior managed object", async () => {
   const events: string[] = [];
   let avatar: { avatarUrl: string | null; avatarObjectKey: string | null } = {
     avatarUrl: "https://media.example.com/old.png",
@@ -66,15 +63,12 @@ void test("avatar replacement updates the profile before deleting the prior mana
     { bytes: png, claimedContentType: "image/png" },
     { storage, repository },
   );
-  assert.deepEqual(events, ["upload", "update-profile", "delete-old"]);
-  assert.equal(
-    avatar.avatarObjectKey?.startsWith("users/user_1/avatar/"),
-    true,
-  );
-  assert.equal(result.cleanupFailed, false);
+  expect(events).toStrictEqual(["upload", "update-profile", "delete-old"]);
+  expect(avatar.avatarObjectKey?.startsWith("users/user_1/avatar/")).toBe(true);
+  expect(result.cleanupFailed).toBe(false);
 });
 
-void test("external avatars are cleared without asking storage to delete their URL", async () => {
+test("external avatars are cleared without asking storage to delete their URL", async () => {
   let deletes = 0;
   const storage: ObjectStorage = {
     driver: "r2",
@@ -95,16 +89,15 @@ void test("external avatars are cleared without asking storage to delete their U
       });
     },
     setAvatar(_userId, avatar) {
-      assert.deepEqual(avatar, { avatarUrl: null, avatarObjectKey: null });
+      expect(avatar).toStrictEqual({ avatarUrl: null, avatarObjectKey: null });
       return Promise.resolve(true);
     },
   };
-  assert.deepEqual(
+  expect(
     await removeProfileAvatar("user_1", { storage, repository }),
-    {
-      removed: true,
-      cleanupFailed: false,
-    },
-  );
-  assert.equal(deletes, 0);
+  ).toStrictEqual({
+    removed: true,
+    cleanupFailed: false,
+  });
+  expect(deletes).toBe(0);
 });

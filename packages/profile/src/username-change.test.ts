@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   getUsernameChangeState,
@@ -7,42 +6,38 @@ import {
 } from "./username-change.ts";
 import { usernameChangeSchema } from "./index.ts";
 
-void test("username confirmation is required only for a changed username", () => {
-  assert.deepEqual(getUsernameChangeState("takshil", " TaKsHiL "), {
+test("username confirmation is required only for a changed username", () => {
+  expect(getUsernameChangeState("takshil", " TaKsHiL ")).toStrictEqual({
     changed: false,
     normalizedUsername: "takshil",
   });
-  assert.deepEqual(getUsernameChangeState("takshil", "takshilcodes"), {
+  expect(getUsernameChangeState("takshil", "takshilcodes")).toStrictEqual({
     changed: true,
     normalizedUsername: "takshilcodes",
   });
 });
 
-void test("confirmation requires the exact normalized username", () => {
-  assert.equal(usernameConfirmationMatches("takshilcodes", ""), false);
-  assert.equal(
-    usernameConfirmationMatches("takshilcodes", "TakshilCodes"),
+test("confirmation requires the exact normalized username", () => {
+  expect(usernameConfirmationMatches("takshilcodes", "")).toBe(false);
+  expect(usernameConfirmationMatches("takshilcodes", "TakshilCodes")).toBe(
     false,
   );
-  assert.equal(
-    usernameConfirmationMatches("takshilcodes", "takshilcodes"),
+  expect(usernameConfirmationMatches("takshilcodes", "takshilcodes")).toBe(
     true,
   );
 });
 
-void test("server schema rejects a confirmation that does not match", () => {
-  assert.equal(
+test("server schema rejects a confirmation that does not match", () => {
+  expect(
     usernameChangeSchema.safeParse({
       username: "TakshilCodes",
       confirmation: "TakshilCodes",
     }).success,
-    false,
-  );
-  assert.equal(
+  ).toBe(false);
+  expect(
     usernameChangeSchema.safeParse({
       username: "TakshilCodes",
       confirmation: "takshilcodes",
     }).success,
-    true,
-  );
+  ).toBe(true);
 });

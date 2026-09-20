@@ -1,5 +1,5 @@
 import { takeRateLimit } from "@townhawll/cache";
-import type { AccountStatus } from "@townhawll/db";
+import type { AccountStatus, StaffRole } from "@townhawll/db";
 import type { Adapter } from "next-auth/adapters";
 import { z } from "zod";
 
@@ -15,6 +15,7 @@ const verifiedGoogleProfileSchema = z.object({
 
 interface GoogleAccountUser {
   id: string;
+  roles?: StaffRole[];
   status: AccountStatus;
 }
 
@@ -31,6 +32,15 @@ interface GoogleSignInDependencies {
 
 export type GoogleSignInDecision =
   { allowed: false } | { allowed: true; flow: "link" | "new" | "returning" };
+
+export type AdminGoogleSignInDecision =
+  | { allowed: false }
+  | {
+      access: "non-staff" | "staff";
+      allowed: true;
+      flow: "link" | "returning";
+      userId: string;
+    };
 
 const prismaGoogleSignInRepository: GoogleSignInRepository = {
   async findByEmail(email) {
@@ -52,6 +62,54 @@ const prismaGoogleSignInRepository: GoogleSignInRepository = {
       select: { user: { select: { id: true, status: true } } },
     });
     return account?.user ?? null;
+  },
+};
+
+const prismaAdminGoogleSignInRepository: GoogleSignInRepository = {
+  async findByEmail(email) {
+    const { db } = await import("@townhawll/db");
+    const user = await db.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        status: true,
+        staffRoleAssignments: { select: { role: true } },
+      },
+    });
+    return user
+      ? {
+          id: user.id,
+          roles: user.staffRoleAssignments.map(({ role }) => role),
+          status: user.status,
+        }
+      : null;
+  },
+  async findByProviderAccountId(providerAccountId) {
+    const { db } = await import("@townhawll/db");
+    const account = await db.account.findUnique({
+      where: {
+        provider_providerAccountId: {
+          provider: GOOGLE_PROVIDER_ID,
+          providerAccountId,
+        },
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            status: true,
+            staffRoleAssignments: { select: { role: true } },
+          },
+        },
+      },
+    });
+    return account
+      ? {
+          id: account.user.id,
+          roles: account.user.staffRoleAssignments.map(({ role }) => role),
+          status: account.user.status,
+        }
+      : null;
   },
 };
 
@@ -92,6 +150,32 @@ export async function getGoogleSignInDecision(
   return { allowed: true, flow: "new" };
 }
 
+export async function getAdminGoogleSignInDecision(
+  input: { profile: unknown; providerAccountId: string },
+  dependencies: GoogleSignInDependencies = {
+    repository: prismaAdminGoogleSignInRepository,
+  },
+): Promise<AdminGoogleSignInDecision> {
+  const profile = parseVerifiedGoogleProfile(input.profile);
+  if (!profile) return { allowed: false };
+
+  const accountUser = await dependencies.repository.findByProviderAccountId(
+    input.providerAccountId,
+  );
+  const flow = accountUser ? "returning" : "link";
+  const user =
+    accountUser ?? (await dependencies.repository.findByEmail(profile.email));
+
+  if (!user || user.status !== "ACTIVE") return { allowed: false };
+
+  return {
+    access: user.roles?.length ? "staff" : "non-staff",
+    allowed: true,
+    flow,
+    userId: user.id,
+  };
+}
+
 export function createGoogleAuthAdapter(
   adapter: Adapter,
   now: () => Date = () => new Date(),
@@ -105,6 +189,17 @@ export function createGoogleAuthAdapter(
     ...adapter,
     createUser(user) {
       return createUser({ ...user, emailVerified: now() });
+    },
+  };
+}
+
+export function createExistingUserOnlyGoogleAuthAdapter(
+  adapter: Adapter,
+): Adapter {
+  return {
+    ...adapter,
+    createUser() {
+      throw new Error("Admin Google OAuth cannot create TownHawll users.");
     },
   };
 }

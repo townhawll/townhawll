@@ -1,4 +1,5 @@
 export { Badge, badgeVariants, type BadgeProps } from "./components/badge";
+export { Avatar, type AvatarProps } from "./components/avatar";
 export { Button, buttonVariants, type ButtonProps } from "./components/button";
 export { Checkbox } from "./components/checkbox";
 export { Input } from "./components/input";
