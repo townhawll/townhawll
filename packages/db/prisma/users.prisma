@@ -1,0 +1,68 @@
+enum AccountStatus {
+  ACTIVE
+  RESTRICTED
+  SUSPENDED
+  BANNED
+  DELETED
+}
+
+enum StaffRole {
+  CONTENT_EDITOR
+  MODERATOR
+  ADMIN
+  TECHNICAL_ADMIN
+  OWNER
+}
+
+model User {
+  id                   String                @id @default(cuid())
+  email                String                @unique @db.Citext
+  passwordHash         String?               @map("password_hash") @db.Text
+  emailVerified        DateTime?             @map("email_verified")
+  name                 String?
+  image                String?
+  status               AccountStatus         @default(ACTIVE)
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime              @updatedAt @map("updated_at")
+  accounts             Account[]
+  sessions             Session[]
+  resetTokens          PasswordResetToken[]
+  profile              Profile?
+  staffRoleAssignments StaffRoleAssignment[]
+
+  @@map("users")
+}
+
+model StaffRoleAssignment {
+  userId     String    @map("user_id")
+  role       StaffRole
+  assignedAt DateTime  @default(now()) @map("assigned_at")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, role])
+  @@index([role])
+  @@map("staff_role_assignments")
+}
+
+enum ContentFocus {
+  GAMES
+  SCREEN
+  BOTH
+}
+
+model Profile {
+  userId                   String        @id @map("user_id")
+  username                 String?       @unique @db.Citext
+  displayName              String?       @map("display_name")
+  avatarUrl                String?       @map("avatar_url") @db.Text
+  avatarObjectKey          String?       @map("avatar_object_key") @db.Text
+  bio                      String?       @db.VarChar(500)
+  contentFocus             ContentFocus? @map("content_focus")
+  onboardingProfileSavedAt DateTime?     @map("onboarding_profile_saved_at")
+  onboardingCompletedAt    DateTime?     @map("onboarding_completed_at")
+  createdAt                DateTime      @default(now()) @map("created_at")
+  updatedAt                DateTime      @updatedAt @map("updated_at")
+  user                     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
