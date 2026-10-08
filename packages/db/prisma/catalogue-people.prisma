@@ -1,0 +1,50 @@
+enum CreditType {
+  CAST
+  CREW
+  CREATOR
+}
+
+model Person {
+  id           String                  @id @default(cuid())
+  name         String
+  biography    String?                 @db.Text
+  birthday     DateTime?               @db.Date
+  deathday     DateTime?               @db.Date
+  placeOfBirth String?                 @map("place_of_birth")
+  createdAt    DateTime                @default(now()) @map("created_at")
+  updatedAt    DateTime                @updatedAt @map("updated_at")
+  mappings     PersonProviderMapping[]
+  credits      Credit[]
+  media        MediaAsset[]
+
+  @@map("people")
+}
+
+model PersonProviderMapping {
+  id               String @id @default(cuid())
+  personId         String @map("person_id")
+  provider         String
+  providerPersonId String @map("provider_person_id")
+  person           Person @relation(fields: [personId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, providerPersonId])
+  @@index([personId])
+  @@map("person_provider_mappings")
+}
+
+model Credit {
+  id            String     @id @default(cuid())
+  titleId       String     @map("title_id")
+  personId      String     @map("person_id")
+  type          CreditType
+  characterName String?    @map("character_name")
+  job           String?
+  department    String?
+  displayOrder  Int?       @map("display_order")
+  title         Title      @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  person        Person     @relation(fields: [personId], references: [id], onDelete: Restrict)
+
+  @@index([titleId, type, displayOrder])
+  @@index([personId, titleId])
+  @@map("credits")
+}

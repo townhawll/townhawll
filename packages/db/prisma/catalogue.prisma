@@ -1,0 +1,297 @@
+enum TitleType {
+  MOVIE
+  SERIES
+  GAME
+}
+
+enum PublicationStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+  ARCHIVED
+}
+
+enum ReviewStatus {
+  NEEDS_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum MovieStatus {
+  PLANNED
+  IN_PRODUCTION
+  POST_PRODUCTION
+  RELEASED
+  CANCELED
+  UNKNOWN
+}
+
+enum SeriesStatus {
+  RETURNING
+  ENDED
+  CANCELED
+  IN_PRODUCTION
+  PLANNED
+  UNKNOWN
+}
+
+enum GameReleaseStatus {
+  RELEASED
+  UPCOMING
+  DELAYED
+  CANCELLED
+  EARLY_ACCESS
+  UNKNOWN
+}
+
+enum GameType {
+  MAIN_GAME
+  DLC
+  EXPANSION
+  STANDALONE_EXPANSION
+  REMAKE
+  REMASTER
+  EDITION
+  BUNDLE
+  OTHER
+}
+
+enum GameMode {
+  SINGLE_PLAYER
+  MULTIPLAYER
+  CO_OP
+  MMO
+  SPLIT_SCREEN
+}
+
+enum SystemPlatform {
+  WINDOWS
+  MACOS
+  LINUX
+}
+
+enum RequirementTier {
+  MINIMUM
+  RECOMMENDED
+}
+
+enum TitleRelationType {
+  DLC
+  EXPANSION
+  STANDALONE_EXPANSION
+  EDITION
+  REMAKE
+  REMASTER
+  SEQUEL
+  PREQUEL
+  SPIN_OFF
+  REBOOT
+  ADAPTATION
+  RELATED
+}
+
+model Title {
+  id                            String            @id @default(cuid())
+  type                          TitleType
+  slug                          String            @unique
+  title                         String
+  originalTitle                 String?           @map("original_title")
+  overview                      String?           @db.Text
+  primaryReleaseDate            DateTime?         @map("primary_release_date") @db.Date
+  isAnime                       Boolean           @default(false) @map("is_anime")
+  normalizedAgeRating           String?           @map("normalized_age_rating")
+  effectiveCertification        String?           @map("effective_certification")
+  effectiveCertificationSystem  String?           @map("effective_certification_system")
+  effectiveCertificationCountry String?           @map("effective_certification_country")
+  providerCertifications        Json?             @map("provider_certifications")
+  publicationStatus             PublicationStatus @default(DRAFT) @map("publication_status")
+  reviewStatus                  ReviewStatus      @default(NEEDS_REVIEW) @map("review_status")
+  deletedAt                     DateTime?         @map("deleted_at")
+  createdAt                     DateTime          @default(now()) @map("created_at")
+  updatedAt                     DateTime          @updatedAt @map("updated_at")
+
+  movie             MovieMetadata?
+  series            SeriesMetadata?
+  game              GameMetadata?
+  seasons           Season[]                @relation("SeriesSeasons")
+  providerMappings  TitleProviderMapping[]
+  aliases           TitleAlias[]
+  media             MediaAsset[]
+  videos            VideoAsset[]
+  genres            TitleGenre[]
+  keywords          TitleKeyword[]
+  credits           Credit[]
+  companies         TitleCompany[]
+  franchises        TitleFranchise[]
+  watchProviders    TitleWatchProvider[]
+  gamePlatforms     GamePlatform[]
+  requirements      GameSystemRequirement[]
+  completionTime    GameCompletionTime?
+  awardEntries      IndustryAwardEntry[]
+  outgoingRelations TitleRelation[]         @relation("RelationSource")
+  incomingRelations TitleRelation[]         @relation("RelationTarget")
+
+  @@index([publicationStatus, type, primaryReleaseDate(sort: Desc), id])
+  @@index([type, isAnime])
+  @@index([deletedAt])
+  @@map("titles")
+}
+
+model TitleProviderMapping {
+  id                 String    @id @default(cuid())
+  titleId            String    @map("title_id")
+  provider           String
+  providerId         String    @map("provider_id")
+  sourceUrl          String?   @map("source_url")
+  providerPopularity Float?    @map("provider_popularity")
+  fetchedAt          DateTime  @default(now()) @map("fetched_at")
+  sourceUpdatedAt    DateTime? @map("source_updated_at")
+  title              Title     @relation(fields: [titleId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, providerId])
+  @@index([titleId])
+  @@map("title_provider_mappings")
+}
+
+model ProviderSnapshot {
+  id          String    @id @default(cuid())
+  provider    String
+  providerId  String    @map("provider_id")
+  entityType  String    @map("entity_type")
+  payload     Json
+  contentHash String?   @map("content_hash")
+  fetchedAt   DateTime  @default(now()) @map("fetched_at")
+  expiresAt   DateTime? @map("expires_at")
+
+  @@index([provider, providerId, entityType])
+  @@index([expiresAt])
+  @@map("provider_snapshots")
+}
+
+model TitleAlias {
+  id            String  @id @default(cuid())
+  titleId       String  @map("title_id")
+  name          String
+  normalizedKey String  @map("normalized_key")
+  provider      String?
+  languageCode  String? @map("language_code")
+  title         Title   @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([titleId, normalizedKey])
+  @@index([normalizedKey])
+  @@map("title_aliases")
+}
+
+model MovieMetadata {
+  titleId                String      @id @map("title_id")
+  status                 MovieStatus @default(UNKNOWN)
+  runtimeMinutes         Int?        @map("runtime_minutes")
+  originalLanguageCode   String?     @map("original_language_code")
+  dubbedLanguageCodes    String[]    @default([]) @map("dubbed_language_codes")
+  productionCountryCodes String[]    @default([]) @map("production_country_codes")
+  title                  Title       @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@map("movie_metadata")
+}
+
+model SeriesMetadata {
+  titleId               String       @id @map("title_id")
+  lastAirDate           DateTime?    @map("last_air_date") @db.Date
+  averageEpisodeRuntime Int?         @map("average_episode_runtime")
+  status                SeriesStatus @default(UNKNOWN)
+  numberOfSeasons       Int?         @map("number_of_seasons")
+  numberOfEpisodes      Int?         @map("number_of_episodes")
+  originalLanguageCode  String?      @map("original_language_code")
+  dubbedLanguageCodes   String[]     @default([]) @map("dubbed_language_codes")
+  originCountryCodes    String[]     @default([]) @map("origin_country_codes")
+  title                 Title        @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@map("series_metadata")
+}
+
+model Season {
+  id               String                  @id @default(cuid())
+  seriesTitleId    String                  @map("series_title_id")
+  seasonNumber     Int                     @map("season_number")
+  name             String?
+  airDate          DateTime?               @map("air_date") @db.Date
+  episodeCount     Int?                    @map("episode_count")
+  createdAt        DateTime                @default(now()) @map("created_at")
+  updatedAt        DateTime                @updatedAt @map("updated_at")
+  series           Title                   @relation("SeriesSeasons", fields: [seriesTitleId], references: [id], onDelete: Restrict)
+  providerMappings SeasonProviderMapping[]
+  media            MediaAsset[]
+
+  @@unique([seriesTitleId, seasonNumber])
+  @@map("seasons")
+}
+
+model SeasonProviderMapping {
+  id         String @id @default(cuid())
+  seasonId   String @map("season_id")
+  provider   String
+  providerId String @map("provider_id")
+  season     Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@index([seasonId])
+  @@map("season_provider_mappings")
+}
+
+model GameMetadata {
+  titleId             String            @id @map("title_id")
+  releaseStatus       GameReleaseStatus @default(UNKNOWN) @map("release_status")
+  gameType            GameType          @default(MAIN_GAME) @map("game_type")
+  primaryLanguageCode String?           @map("primary_language_code")
+  modes               GameMode[]        @default([])
+  title               Title             @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@map("game_metadata")
+}
+
+model GameCompletionTime {
+  titleId              String    @id @map("title_id")
+  mainStoryMinutes     Int?      @map("main_story_minutes")
+  mainPlusExtraMinutes Int?      @map("main_plus_extra_minutes")
+  completionistMinutes Int?      @map("completionist_minutes")
+  source               String?
+  sourceUpdatedAt      DateTime? @map("source_updated_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  title                Title     @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@map("game_completion_times")
+}
+
+model GameSystemRequirement {
+  id              String          @id @default(cuid())
+  titleId         String          @map("title_id")
+  platform        SystemPlatform
+  tier            RequirementTier
+  os              String?
+  cpu             String?
+  gpu             String?
+  ramMb           Int?            @map("ram_mb")
+  storageMb       Int?            @map("storage_mb")
+  directX         String?         @map("direct_x")
+  additionalNotes String?         @map("additional_notes") @db.Text
+  rawText         String?         @map("raw_text") @db.Text
+  source          String?
+  sourceUpdatedAt DateTime?       @map("source_updated_at")
+  title           Title           @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([titleId, platform, tier])
+  @@map("game_system_requirements")
+}
+
+model TitleRelation {
+  id            String            @id @default(cuid())
+  sourceTitleId String            @map("source_title_id")
+  targetTitleId String            @map("target_title_id")
+  type          TitleRelationType
+  source        Title             @relation("RelationSource", fields: [sourceTitleId], references: [id], onDelete: Cascade)
+  target        Title             @relation("RelationTarget", fields: [targetTitleId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceTitleId, targetTitleId, type])
+  @@index([targetTitleId, type])
+  @@map("title_relations")
+}

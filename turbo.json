@@ -50,6 +50,11 @@
       "dependsOn": ["^test"],
       "outputs": []
     },
+    "@townhawll/db#test": {
+      "dependsOn": ["generate"],
+      "cache": false,
+      "outputs": []
+    },
     "@townhawll/db#lint": {
       "dependsOn": ["^lint", "generate"],
       "outputs": []

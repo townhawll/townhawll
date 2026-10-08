@@ -1,0 +1,181 @@
+enum KeywordType {
+  KEYWORD
+  THEME
+  TAG
+}
+
+enum CompanyRole {
+  DEVELOPER
+  PUBLISHER
+  PRODUCTION_COMPANY
+  STUDIO
+  NETWORK
+}
+
+model Platform {
+  id               String                    @id @default(cuid())
+  name             String
+  slug             String                    @unique
+  providerMappings PlatformProviderMapping[]
+  gamePlatforms    GamePlatform[]
+
+  @@map("platforms")
+}
+
+model PlatformProviderMapping {
+  id         String   @id @default(cuid())
+  platformId String   @map("platform_id")
+  provider   String
+  providerId String   @map("provider_id")
+  platform   Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@index([platformId])
+  @@map("platform_provider_mappings")
+}
+
+model GamePlatform {
+  id            String             @id @default(cuid())
+  titleId       String             @map("title_id")
+  platformId    String             @map("platform_id")
+  releaseDate   DateTime?          @map("release_date") @db.Date
+  releaseStatus GameReleaseStatus? @map("release_status")
+  title         Title              @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  platform      Platform           @relation(fields: [platformId], references: [id], onDelete: Restrict)
+
+  @@unique([titleId, platformId])
+  @@index([platformId, titleId])
+  @@map("game_platforms")
+}
+
+model Genre {
+  id     String       @id @default(cuid())
+  name   String
+  slug   String       @unique
+  titles TitleGenre[]
+
+  @@map("genres")
+}
+
+model TitleGenre {
+  titleId String @map("title_id")
+  genreId String @map("genre_id")
+  title   Title  @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Restrict)
+
+  @@id([titleId, genreId])
+  @@index([genreId, titleId])
+  @@map("title_genres")
+}
+
+model Keyword {
+  id     String         @id @default(cuid())
+  name   String
+  slug   String
+  type   KeywordType
+  titles TitleKeyword[]
+
+  @@unique([type, slug])
+  @@map("keywords")
+}
+
+model TitleKeyword {
+  titleId   String  @map("title_id")
+  keywordId String  @map("keyword_id")
+  title     Title   @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  keyword   Keyword @relation(fields: [keywordId], references: [id], onDelete: Restrict)
+
+  @@id([titleId, keywordId])
+  @@index([keywordId, titleId])
+  @@map("title_keywords")
+}
+
+model Company {
+  id       String                   @id @default(cuid())
+  name     String
+  mappings CompanyProviderMapping[]
+  titles   TitleCompany[]
+
+  @@map("companies")
+}
+
+model CompanyProviderMapping {
+  id                String  @id @default(cuid())
+  companyId         String  @map("company_id")
+  provider          String
+  providerCompanyId String  @map("provider_company_id")
+  company           Company @relation(fields: [companyId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, providerCompanyId])
+  @@index([companyId])
+  @@map("company_provider_mappings")
+}
+
+model TitleCompany {
+  titleId   String      @map("title_id")
+  companyId String      @map("company_id")
+  role      CompanyRole
+  title     Title       @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  company   Company     @relation(fields: [companyId], references: [id], onDelete: Restrict)
+
+  @@id([titleId, companyId, role])
+  @@index([companyId, titleId])
+  @@map("title_companies")
+}
+
+model Franchise {
+  id       String                     @id @default(cuid())
+  name     String
+  mappings FranchiseProviderMapping[]
+  titles   TitleFranchise[]
+
+  @@map("franchises")
+}
+
+model FranchiseProviderMapping {
+  id                  String    @id @default(cuid())
+  franchiseId         String    @map("franchise_id")
+  provider            String
+  providerFranchiseId String    @map("provider_franchise_id")
+  franchise           Franchise @relation(fields: [franchiseId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, providerFranchiseId])
+  @@index([franchiseId])
+  @@map("franchise_provider_mappings")
+}
+
+model TitleFranchise {
+  titleId     String    @map("title_id")
+  franchiseId String    @map("franchise_id")
+  title       Title     @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  franchise   Franchise @relation(fields: [franchiseId], references: [id], onDelete: Restrict)
+
+  @@id([titleId, franchiseId])
+  @@index([franchiseId, titleId])
+  @@map("title_franchises")
+}
+
+model WatchProvider {
+  id         String               @id @default(cuid())
+  provider   String
+  providerId String               @map("provider_id")
+  name       String
+  titles     TitleWatchProvider[]
+
+  @@unique([provider, providerId])
+  @@map("watch_providers")
+}
+
+model TitleWatchProvider {
+  id              String        @id @default(cuid())
+  titleId         String        @map("title_id")
+  watchProviderId String        @map("watch_provider_id")
+  regionCode      String        @map("region_code")
+  accessType      String?       @map("access_type")
+  title           Title         @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  watchProvider   WatchProvider @relation(fields: [watchProviderId], references: [id], onDelete: Restrict)
+
+  @@unique([titleId, watchProviderId, regionCode, accessType])
+  @@index([watchProviderId, regionCode])
+  @@map("title_watch_providers")
+}
