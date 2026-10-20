@@ -11,6 +11,7 @@
     "db:smoke": "tsx src/smoke.ts",
     "db:studio": "prisma studio",
     "lint": "eslint .",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "exports": {
@@ -31,6 +32,7 @@
     "eslint": "catalog:",
     "prisma": "catalog:",
     "tsx": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

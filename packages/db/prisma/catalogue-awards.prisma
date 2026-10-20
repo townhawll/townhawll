@@ -1,0 +1,48 @@
+enum IndustryAwardResult {
+  WINNER
+  NOMINEE
+}
+
+model IndustryAward {
+  id         String                  @id @default(cuid())
+  name       String
+  slug       String                  @unique
+  organizer  String?
+  websiteUrl String?                 @map("website_url")
+  createdAt  DateTime                @default(now()) @map("created_at")
+  updatedAt  DateTime                @updatedAt @map("updated_at")
+  categories IndustryAwardCategory[]
+
+  @@map("industry_awards")
+}
+
+model IndustryAwardCategory {
+  id              String               @id @default(cuid())
+  industryAwardId String               @map("industry_award_id")
+  name            String
+  slug            String
+  award           IndustryAward        @relation(fields: [industryAwardId], references: [id], onDelete: Restrict)
+  entries         IndustryAwardEntry[]
+
+  @@unique([industryAwardId, slug])
+  @@map("industry_award_categories")
+}
+
+model IndustryAwardEntry {
+  id                      String                @id @default(cuid())
+  industryAwardCategoryId String                @map("industry_award_category_id")
+  titleId                 String                @map("title_id")
+  year                    Int
+  result                  IndustryAwardResult
+  sourceUrl               String?               @map("source_url")
+  note                    String?
+  createdAt               DateTime              @default(now()) @map("created_at")
+  updatedAt               DateTime              @updatedAt @map("updated_at")
+  category                IndustryAwardCategory @relation(fields: [industryAwardCategoryId], references: [id], onDelete: Restrict)
+  title                   Title                 @relation(fields: [titleId], references: [id], onDelete: Restrict)
+
+  @@unique([industryAwardCategoryId, titleId, year])
+  @@index([titleId, year])
+  @@index([industryAwardCategoryId, year])
+  @@map("industry_award_entries")
+}

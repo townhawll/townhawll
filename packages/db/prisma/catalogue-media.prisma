@@ -1,0 +1,135 @@
+enum MediaPurpose {
+  POSTER
+  HERO_ART
+  PERSON_IMAGE
+  AVATAR
+  COLLECTION_COVER
+  PROFILE_BANNER
+  LOGO
+}
+
+enum MediaSourceType {
+  POSTER
+  BACKDROP
+  ARTWORK
+  COVER
+  PROFILE
+  LOGO
+  UPLOAD
+}
+
+enum MediaVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum MediaProcessingStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum MediaVariantType {
+  CARD
+  MASTER
+  OPTIMIZED
+}
+
+enum VideoType {
+  TRAILER
+  TEASER
+  GAMEPLAY
+  OTHER
+}
+
+model MediaAsset {
+  id                String              @id @default(cuid())
+  titleId           String?             @map("title_id")
+  seasonId          String?             @map("season_id")
+  personId          String?             @map("person_id")
+  purpose           MediaPurpose
+  sourceType        MediaSourceType     @map("source_type")
+  provider          String?
+  providerAssetId   String?             @map("provider_asset_id")
+  providerSourceUrl String?             @map("provider_source_url")
+  sourceHash        String?             @map("source_hash")
+  sourceWidth       Int?                @map("source_width")
+  sourceHeight      Int?                @map("source_height")
+  selectionReason   String?             @map("selection_reason")
+  visibility        MediaVisibility     @default(PUBLIC)
+  currentVersionId  String?             @map("current_version_id")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  title             Title?              @relation(fields: [titleId], references: [id], onDelete: Restrict)
+  season            Season?             @relation(fields: [seasonId], references: [id], onDelete: Restrict)
+  person            Person?             @relation(fields: [personId], references: [id], onDelete: Restrict)
+  versions          MediaAssetVersion[] @relation("AssetVersions")
+  currentVersion    MediaAssetVersion?  @relation("CurrentMediaVersion", fields: [currentVersionId, id], references: [id, mediaAssetId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([currentVersionId, id])
+  @@index([titleId, purpose])
+  @@index([seasonId, purpose])
+  @@index([personId, purpose])
+  @@map("media_assets")
+}
+
+model MediaAssetVersion {
+  id                String                @id @default(cuid())
+  mediaAssetId      String                @map("media_asset_id")
+  processingProfile String                @map("processing_profile")
+  processingVersion String                @map("processing_version")
+  status            MediaProcessingStatus @default(PENDING)
+  sourceHash        String?               @map("source_hash")
+  failureStage      String?               @map("failure_stage")
+  failureMessage    String?               @map("failure_message")
+  activatedAt       DateTime?             @map("activated_at")
+  replacedAt        DateTime?             @map("replaced_at")
+  deleteAfter       DateTime?             @map("delete_after")
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
+  asset             MediaAsset            @relation("AssetVersions", fields: [mediaAssetId], references: [id], onDelete: Restrict)
+  selectedBy        MediaAsset?           @relation("CurrentMediaVersion")
+  variants          MediaVariant[]
+
+  @@unique([id, mediaAssetId])
+  @@index([mediaAssetId, createdAt])
+  @@index([deleteAfter])
+  @@map("media_asset_versions")
+}
+
+model MediaVariant {
+  id          String            @id @default(cuid())
+  versionId   String            @map("version_id")
+  type        MediaVariantType
+  objectKey   String            @unique @map("object_key")
+  width       Int
+  height      Int
+  mimeType    String            @map("mime_type")
+  byteSize    BigInt            @map("byte_size")
+  contentHash String?           @map("content_hash")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  version     MediaAssetVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@unique([versionId, type])
+  @@map("media_variants")
+}
+
+model VideoAsset {
+  id              String    @id @default(cuid())
+  titleId         String    @map("title_id")
+  provider        String?
+  providerVideoId String?   @map("provider_video_id")
+  platform        String
+  externalKey     String    @map("external_key")
+  type            VideoType
+  name            String?
+  official        Boolean?
+  selected        Boolean   @default(false)
+  languageCode    String?   @map("language_code")
+  title           Title     @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([titleId, platform, externalKey])
+  @@index([titleId, selected, type])
+  @@map("video_assets")
+}

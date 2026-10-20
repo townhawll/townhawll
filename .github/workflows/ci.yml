@@ -15,14 +15,29 @@ concurrency:
 
 jobs:
   checks:
-    name: Format, lint, types, and build
+    name: Format, lint, types, tests, and build
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      HUSKY: "0"
       NEXT_TELEMETRY_DISABLED: "1"
       TURBO_TELEMETRY_DISABLED: "1"
-      DATABASE_URL: postgresql://townhawll:townhawll_dev@localhost:5433/townhawll
+      DATABASE_URL: postgresql://townhawll:townhawll_dev@localhost:5433/townhawll_test
       REDIS_URL: redis://localhost:6379
+      TOWNHAWLL_DB_INTEGRATION: "1"
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: townhawll_test
+          POSTGRES_USER: townhawll
+          POSTGRES_PASSWORD: townhawll_dev
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U townhawll -d townhawll_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
 
     steps:
       - name: Check out repository
@@ -49,6 +64,12 @@ jobs:
 
       - name: Check types
         run: pnpm run typecheck
+
+      - name: Apply migrations to disposable test database
+        run: pnpm --filter @townhawll/db exec prisma migrate deploy
+
+      - name: Test
+        run: pnpm run test
 
       - name: Build
         run: pnpm run build

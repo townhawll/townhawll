@@ -5,6 +5,7 @@
     "build": "turbo run build",
     "dev": "node --env-file=.env node_modules/turbo/bin/turbo run dev",
     "lint": "turbo run lint",
+    "lint:staged": "lint-staged --concurrent false",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "format": "prettier --write .",
@@ -17,9 +18,12 @@
     "db:reset": "pnpm --filter @townhawll/db db:reset",
     "db:studio": "pnpm --filter @townhawll/db db:studio",
     "db:smoke": "pnpm --filter @townhawll/db db:smoke",
-    "staff:bootstrap-owner": "pnpm --filter @townhawll/auth bootstrap:owner"
+    "staff:bootstrap-owner": "pnpm --filter @townhawll/auth bootstrap:owner",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "husky": "catalog:",
+    "lint-staged": "catalog:",
     "prettier": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:",

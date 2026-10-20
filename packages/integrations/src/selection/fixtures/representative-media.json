@@ -1,0 +1,1316 @@
+{
+  "note": "Recorded provider inputs, including deliberately unsuitable images and videos, not approved content-page selections. Explicit backdropReview assessments are separate from recorded source values. Missing evidence stays unknown.",
+  "games": [
+    {
+      "id": "25076",
+      "title": "Red Dead Redemption 2",
+      "playgroundHero": "x8xczj2a0y6g9rnhboko",
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1q1f.jpg",
+      "candidates": [
+        {
+          "id": "x8xczj2a0y6g9rnhboko",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/x8xczj2a0y6g9rnhboko.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.4999607812363756,
+            "dynamicRange": 1,
+            "detailSpread": 0.7222222222222222,
+            "focalRightBias": 0.4779181925942329,
+            "emptySpace": 0.2777777777777778,
+            "overlayComplexity": 0.2915064802053762,
+            "overlayBrightness": 0.5820598600712524,
+            "saturation": 0.23889040214659074,
+            "textLikelihood": 0.020517676767676764,
+            "cornerTextLikelihood": 0.015061692693271641,
+            "hudLikelihood": 0.06713828183976242,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "l0kjrldascktx2kzqhbi",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/l0kjrldascktx2kzqhbi.jpg",
+          "type": "ARTWORK",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.23103407045207214,
+            "dynamicRange": 1,
+            "detailSpread": 0.3125,
+            "focalRightBias": 0.4522742723186408,
+            "emptySpace": 0.6875,
+            "overlayComplexity": 0.2751643929066701,
+            "overlayBrightness": 0.22173474062277607,
+            "saturation": 0.8645427168915021,
+            "textLikelihood": 0.2178030303030303,
+            "cornerTextLikelihood": 0.5361962598804704,
+            "hudLikelihood": 0.22097236641017076,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "c9xalka7stjkx4mes7kp",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/c9xalka7stjkx4mes7kp.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.4950308681781432,
+            "dynamicRange": 1,
+            "detailSpread": 0.3472222222222222,
+            "focalRightBias": 0.497960421262308,
+            "emptySpace": 0.6527777777777778,
+            "overlayComplexity": 0.10935744323266468,
+            "overlayBrightness": 0.6534411541600617,
+            "saturation": 0.1362144559862846,
+            "textLikelihood": 0.020833333333333332,
+            "cornerTextLikelihood": 0,
+            "hudLikelihood": 0.02806601923067678,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "mptosgjarjlyqxy7lqsm",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/mptosgjarjlyqxy7lqsm.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.2951125887255022,
+            "dynamicRange": 1,
+            "detailSpread": 0.5069444444444444,
+            "focalRightBias": 0.5210854387584903,
+            "emptySpace": 0.4930555555555556,
+            "overlayComplexity": 0.2025983916949688,
+            "overlayBrightness": 0.1624469847797666,
+            "saturation": 0.34625941973532465,
+            "textLikelihood": 0.04229797979797979,
+            "cornerTextLikelihood": 0.015061692693271641,
+            "hudLikelihood": 0.005033750706165099,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar3qmu",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar3qmu.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null
+        }
+      ]
+    },
+    {
+      "id": "1020",
+      "title": "Grand Theft Auto V",
+      "playgroundHero": "sc10f95",
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2lbd.jpg",
+      "candidates": [
+        {
+          "id": "sc10f95",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sc10f95.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.44384800337688546,
+            "dynamicRange": 1,
+            "detailSpread": 0.4930555555555556,
+            "focalRightBias": 0.5208714514493956,
+            "emptySpace": 0.5069444444444444,
+            "overlayComplexity": 0.3594775457007767,
+            "overlayBrightness": 0.33425394754638504,
+            "saturation": 0.26829815532646095,
+            "textLikelihood": 0.07796717171717171,
+            "cornerTextLikelihood": 0.030123385386543283,
+            "hudLikelihood": 0.11759920723368954,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar6d95",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar6d95.jpg",
+          "type": "ARTWORK",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.5857761564133983,
+            "dynamicRange": 1,
+            "detailSpread": 0.4930555555555556,
+            "focalRightBias": 0.42425067027392105,
+            "emptySpace": 0.5069444444444444,
+            "overlayComplexity": 0.3423584604918133,
+            "overlayBrightness": 0.4689573668352838,
+            "saturation": 0.24550921584048455,
+            "textLikelihood": 0.05555555555555556,
+            "cornerTextLikelihood": 0.04819741661846925,
+            "hudLikelihood": 0.01334115331476383,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "sc10f94",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sc10f94.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1079,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.49877734188451217,
+            "dynamicRange": 1,
+            "detailSpread": 0.6111111111111112,
+            "focalRightBias": 0.4160542090161401,
+            "emptySpace": 0.3888888888888889,
+            "overlayComplexity": 0.2190261465216632,
+            "overlayBrightness": 0.4137034900525609,
+            "saturation": 0.21164902257573762,
+            "textLikelihood": 0.009154040404040404,
+            "cornerTextLikelihood": 0,
+            "hudLikelihood": 0.1342790605614905,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "sc10f9a",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sc10f9a.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1079,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.501858327342021,
+            "dynamicRange": 1,
+            "detailSpread": 0.36111111111111116,
+            "focalRightBias": 0.42840025213923977,
+            "emptySpace": 0.6388888888888888,
+            "overlayComplexity": 0.22045791675967089,
+            "overlayBrightness": 0.3863005279384522,
+            "saturation": 0.24951497973782757,
+            "textLikelihood": 0.007260101010101011,
+            "cornerTextLikelihood": 0.003012338538654328,
+            "hudLikelihood": 0.0635430767572247,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar3m56",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar3m56.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null,
+          "visualReview": {
+            "composition": "LOGO_CARD",
+            "reason": "Grand Theft Auto V logo on a black background, not an in-scene banner."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1942",
+      "title": "The Witcher 3: Wild Hunt",
+      "playgroundHero": "z5t0yuhyiiui1ickwhgj",
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/coaarl.jpg",
+      "candidates": [
+        {
+          "id": "z5t0yuhyiiui1ickwhgj",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/z5t0yuhyiiui1ickwhgj.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.3141948824754844,
+            "dynamicRange": 1,
+            "detailSpread": 0.27083333333333337,
+            "focalRightBias": 0.4963049605297446,
+            "emptySpace": 0.7291666666666666,
+            "overlayComplexity": 0.253126463039376,
+            "overlayBrightness": 0.24512450883862183,
+            "saturation": 0.3264077457291416,
+            "textLikelihood": 0.014520202020202022,
+            "cornerTextLikelihood": 0.10844418739155581,
+            "hudLikelihood": 0.12720552761305684,
+            "letterboxLikelihood": 0.021006555189811937
+          }
+        },
+        {
+          "id": "ar3lzn",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar3lzn.jpg",
+          "type": "ARTWORK",
+          "width": 1920,
+          "height": 1019,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.1185459884123126,
+            "dynamicRange": 1,
+            "detailSpread": 0.17361111111111116,
+            "focalRightBias": 0.4879690772290089,
+            "emptySpace": 0.8263888888888888,
+            "overlayComplexity": 0.17649966588635316,
+            "overlayBrightness": 0.11809977394909998,
+            "saturation": 0.48226520170440307,
+            "textLikelihood": 0.00946969696969697,
+            "cornerTextLikelihood": 0.08735781762097551,
+            "hudLikelihood": 0.07345178936577497,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "sctj8u",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sctj8u.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.5774832815631796,
+            "dynamicRange": 1,
+            "detailSpread": 0.42361111111111116,
+            "focalRightBias": 0.3795754838948664,
+            "emptySpace": 0.5763888888888888,
+            "overlayComplexity": 0.3482762996113075,
+            "overlayBrightness": 0.505489164220058,
+            "saturation": 0.2425386583528099,
+            "textLikelihood": 0.014204545454545456,
+            "cornerTextLikelihood": 0.012049354154617312,
+            "hudLikelihood": 0.13773602829831674,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "sctj8t",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sctj8t.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.49833238021514,
+            "dynamicRange": 1,
+            "detailSpread": 0.36111111111111116,
+            "focalRightBias": 0.5745289795611433,
+            "emptySpace": 0.6388888888888888,
+            "overlayComplexity": 0.35439514817131124,
+            "overlayBrightness": 0.31644066815632965,
+            "saturation": 0.2738742601229826,
+            "textLikelihood": 0.014204545454545456,
+            "cornerTextLikelihood": 0.05120975515712358,
+            "hudLikelihood": 0.22522699920068617,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar3lzh",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar3lzh.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null
+        }
+      ]
+    },
+    {
+      "id": "72",
+      "title": "Portal 2",
+      "playgroundHero": "vghkwbdabx0cri7thb9y",
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1rs4.jpg",
+      "candidates": [
+        {
+          "id": "vghkwbdabx0cri7thb9y",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/vghkwbdabx0cri7thb9y.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.38319348519881063,
+            "dynamicRange": 1,
+            "detailSpread": 0.5486111111111112,
+            "focalRightBias": 0.5197964533999113,
+            "emptySpace": 0.4513888888888889,
+            "overlayComplexity": 0.2732711180782174,
+            "overlayBrightness": 0.49879769620737097,
+            "saturation": 0.29459041045524725,
+            "textLikelihood": 0.020833333333333332,
+            "cornerTextLikelihood": 0.030123385386543283,
+            "hudLikelihood": 0.13100211021448305,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "i9ys3zdhph1mh3futdit",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/i9ys3zdhph1mh3futdit.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.26881088638344564,
+            "dynamicRange": 1,
+            "detailSpread": 0.6319444444444444,
+            "focalRightBias": 0.3943001464282615,
+            "emptySpace": 0.3680555555555556,
+            "overlayComplexity": 0.40573766379616255,
+            "overlayBrightness": 0.30055268498633736,
+            "saturation": 0.25892716584351794,
+            "textLikelihood": 0.15751262626262624,
+            "cornerTextLikelihood": 0.2259253903990746,
+            "hudLikelihood": 0.11961305458851448,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "rvrge8js7xnhr4z1vrbk",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/rvrge8js7xnhr4z1vrbk.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.28853604063180976,
+            "dynamicRange": 1,
+            "detailSpread": 0.47916666666666663,
+            "focalRightBias": 0.6327297318541951,
+            "emptySpace": 0.5208333333333334,
+            "overlayComplexity": 0.19739830125817992,
+            "overlayBrightness": 0.2737024653840528,
+            "saturation": 0.4028344662966576,
+            "textLikelihood": 0.08143939393939394,
+            "cornerTextLikelihood": 0.003012338538654328,
+            "hudLikelihood": 0,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "cmxaa4r52exlqvzwtxkh",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/cmxaa4r52exlqvzwtxkh.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.6051170002179723,
+            "dynamicRange": 1,
+            "detailSpread": 0.6527777777777778,
+            "focalRightBias": 0.46231484035146647,
+            "emptySpace": 0.3472222222222222,
+            "overlayComplexity": 0.2702493608090482,
+            "overlayBrightness": 0.6178582671537041,
+            "saturation": 0.10979313209849496,
+            "textLikelihood": 0.14457070707070704,
+            "cornerTextLikelihood": 0.1626662810873337,
+            "hudLikelihood": 0.09286976100955983,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar4koa",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar4koa.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null
+        }
+      ]
+    },
+    {
+      "id": "71",
+      "title": "Portal",
+      "playgroundHero": null,
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/coay61.jpg",
+      "candidates": [
+        {
+          "id": "gdgj7p0vo52jpwoxtm3v",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/gdgj7p0vo52jpwoxtm3v.jpg",
+          "type": "SCREENSHOT",
+          "width": null,
+          "height": null,
+          "signals": null
+        },
+        {
+          "id": "ar21g0",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar21g0.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null
+        }
+      ]
+    },
+    {
+      "id": "472",
+      "title": "The Elder Scrolls V: Skyrim",
+      "playgroundHero": "muv70yw3rds1cw8ymr5v",
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/cocs1l.jpg",
+      "candidates": [
+        {
+          "id": "muv70yw3rds1cw8ymr5v",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/muv70yw3rds1cw8ymr5v.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.6146936997821196,
+            "dynamicRange": 1,
+            "detailSpread": 0.5694444444444444,
+            "focalRightBias": 0.6350923835313259,
+            "emptySpace": 0.4305555555555556,
+            "overlayComplexity": 0.36839835815695343,
+            "overlayBrightness": 0.6109529779375746,
+            "saturation": 0.22346249961025835,
+            "textLikelihood": 0.06376262626262626,
+            "cornerTextLikelihood": 0.060246770773086565,
+            "hudLikelihood": 0.17132521801656567,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "q6d8jv0yflv8hbomthqm",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/q6d8jv0yflv8hbomthqm.jpg",
+          "type": "ARTWORK",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.41843391621736203,
+            "dynamicRange": 1,
+            "detailSpread": 0.5972222222222222,
+            "focalRightBias": 0.47871876637370847,
+            "emptySpace": 0.4027777777777778,
+            "overlayComplexity": 0.2247628282279366,
+            "overlayBrightness": 0.3245269471193454,
+            "saturation": 0.3787424819604969,
+            "textLikelihood": 0.016414141414141412,
+            "cornerTextLikelihood": 0,
+            "hudLikelihood": 0.009175465357129181,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "xzk2h41fiye7uwbhc6ub",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/xzk2h41fiye7uwbhc6ub.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.5759614667347541,
+            "dynamicRange": 1,
+            "detailSpread": 0.375,
+            "focalRightBias": 0.31746564385183335,
+            "emptySpace": 0.625,
+            "overlayComplexity": 0.30075768652479473,
+            "overlayBrightness": 0.525014011557081,
+            "saturation": 0.3180433473635156,
+            "textLikelihood": 0.023042929292929292,
+            "cornerTextLikelihood": 0.021086369770580298,
+            "hudLikelihood": 0.12754104286107365,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "t0mus35qrgclafo1ql8k",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/t0mus35qrgclafo1ql8k.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.42574022445533516,
+            "dynamicRange": 1,
+            "detailSpread": 0.26388888888888884,
+            "focalRightBias": 0.3885161552974519,
+            "emptySpace": 0.7361111111111112,
+            "overlayComplexity": 0.2890533342882778,
+            "overlayBrightness": 0.23396105123832864,
+            "saturation": 0.2429464793462041,
+            "textLikelihood": 0.019255050505050508,
+            "cornerTextLikelihood": 0.05120975515712358,
+            "hudLikelihood": 0.1740659484265457,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar4n68",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar4n68.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null
+        }
+      ]
+    },
+    {
+      "id": "427",
+      "title": "Final Fantasy VII",
+      "playgroundHero": null,
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2kx2.jpg",
+      "candidates": [
+        {
+          "id": "ar3nl2",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar3nl2.jpg",
+          "type": "ARTWORK",
+          "width": 1920,
+          "height": 904,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.22409989309640388,
+            "dynamicRange": 1,
+            "detailSpread": 0.6944444444444444,
+            "focalRightBias": 0.5576235263490656,
+            "emptySpace": 0.3055555555555556,
+            "overlayComplexity": 0.6171360656870258,
+            "overlayBrightness": 0.32073679339230343,
+            "saturation": 0.08566490143350618,
+            "textLikelihood": 1,
+            "cornerTextLikelihood": 0.551257952573742,
+            "hudLikelihood": 0.15767767250271203,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "giogakgdsde0vzjzfeyv",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/giogakgdsde0vzjzfeyv.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null
+        }
+      ]
+    },
+    {
+      "id": "23733",
+      "title": "Tunic",
+      "playgroundHero": "sc8ggi",
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/td1t8kb33gyo8mvhl2pc.jpg",
+      "candidates": [
+        {
+          "id": "sc8ggi",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sc8ggi.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.4788999174291885,
+            "dynamicRange": 1,
+            "detailSpread": 0.7847222222222222,
+            "focalRightBias": 0.45860812011605573,
+            "emptySpace": 0.2152777777777778,
+            "overlayComplexity": 0.3007231967537824,
+            "overlayBrightness": 0.5170152427895389,
+            "saturation": 0.4973974898022117,
+            "textLikelihood": 0.03156565656565656,
+            "cornerTextLikelihood": 0.04518507807981492,
+            "hudLikelihood": 0.12564186156534882,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar5qqu",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar5qqu.jpg",
+          "type": "ARTWORK",
+          "width": 1920,
+          "height": 960,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.494089620669935,
+            "dynamicRange": 1,
+            "detailSpread": 0.6527777777777778,
+            "focalRightBias": 0.37165220377364094,
+            "emptySpace": 0.3472222222222222,
+            "overlayComplexity": 0.35297535373654515,
+            "overlayBrightness": 0.4760132652336475,
+            "saturation": 0.503124416270345,
+            "textLikelihood": 0.3080808080808081,
+            "cornerTextLikelihood": 0.009037015615962984,
+            "hudLikelihood": 0.023324713470596538,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "scjt5e",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/scjt5e.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.35203851928105223,
+            "dynamicRange": 1,
+            "detailSpread": 0.5833333333333333,
+            "focalRightBias": 0.5112274310330869,
+            "emptySpace": 0.4166666666666667,
+            "overlayComplexity": 0.20282842702240148,
+            "overlayBrightness": 0.3304750796597249,
+            "saturation": 0.5989753861264646,
+            "textLikelihood": 0.06849747474747475,
+            "cornerTextLikelihood": 0.012049354154617312,
+            "hudLikelihood": 0.05762979062363505,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "sc8ggj",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sc8ggj.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.38237827308006633,
+            "dynamicRange": 1,
+            "detailSpread": 0.6875,
+            "focalRightBias": 0.5197852196172912,
+            "emptySpace": 0.3125,
+            "overlayComplexity": 0.31201755658083297,
+            "overlayBrightness": 0.3691725413972977,
+            "saturation": 0.5158298448516772,
+            "textLikelihood": 0.04419191919191919,
+            "cornerTextLikelihood": 0.030123385386543283,
+            "hudLikelihood": 0.13309357428018448,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "arklp",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/arklp.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null
+        }
+      ]
+    },
+    {
+      "id": "9806",
+      "title": "Hyper Light Drifter",
+      "playgroundHero": "w91pzj0x5qwliobtccmz",
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2edn.jpg",
+      "candidates": [
+        {
+          "id": "w91pzj0x5qwliobtccmz",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/w91pzj0x5qwliobtccmz.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.2527726656726562,
+            "dynamicRange": 1,
+            "detailSpread": 0.2152777777777778,
+            "focalRightBias": 0.4760962471750987,
+            "emptySpace": 0.7847222222222222,
+            "overlayComplexity": 0.19533884966008178,
+            "overlayBrightness": 0.3034475809761753,
+            "saturation": 0.6341151789059685,
+            "textLikelihood": 0.01578282828282828,
+            "cornerTextLikelihood": 0.003012338538654328,
+            "hudLikelihood": 0,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar6v3",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar6v3.jpg",
+          "type": "ARTWORK",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.34596127478215005,
+            "dynamicRange": 1,
+            "detailSpread": 0.41666666666666663,
+            "focalRightBias": 0.6034437948738468,
+            "emptySpace": 0.5833333333333334,
+            "overlayComplexity": 0.15660191520026875,
+            "overlayBrightness": 0.45020925977970405,
+            "saturation": 0.7156230432901898,
+            "textLikelihood": 0.01167929292929293,
+            "cornerTextLikelihood": 0.012049354154617312,
+            "hudLikelihood": 0.024858420106477184,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "szeprm3iypqdgokm0kqn",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/szeprm3iypqdgokm0kqn.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.12547958623365937,
+            "dynamicRange": 1,
+            "detailSpread": 0.02777777777777779,
+            "focalRightBias": 0.51068898604445,
+            "emptySpace": 0.9722222222222222,
+            "overlayComplexity": 0.08641278754100389,
+            "overlayBrightness": 0.18000064397586701,
+            "saturation": 0.39582416623526695,
+            "textLikelihood": 0.010732323232323232,
+            "cornerTextLikelihood": 0,
+            "hudLikelihood": 0,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ahyldwgad5fjbluaoumv",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ahyldwgad5fjbluaoumv.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.2537747104166674,
+            "dynamicRange": 0.9526645454545454,
+            "detailSpread": 0.20833333333333337,
+            "focalRightBias": 0.3655056571210516,
+            "emptySpace": 0.7916666666666666,
+            "overlayComplexity": 0.14660975699863132,
+            "overlayBrightness": 0.3336415488234997,
+            "saturation": 0.28178740598493496,
+            "textLikelihood": 0.01167929292929293,
+            "cornerTextLikelihood": 0.006024677077308656,
+            "hudLikelihood": 0.02392886837465945,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar67f5",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar67f5.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null
+        }
+      ]
+    },
+    {
+      "id": "132181",
+      "title": "Resident Evil 4",
+      "playgroundHero": "sch7rm",
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co6bo0.jpg",
+      "candidates": [
+        {
+          "id": "sch7rm",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sch7rm.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.3552191076524506,
+            "dynamicRange": 1,
+            "detailSpread": 0.2777777777777778,
+            "focalRightBias": 0.4529847223353339,
+            "emptySpace": 0.7222222222222222,
+            "overlayComplexity": 0.16789901068933025,
+            "overlayBrightness": 0.1869827718918106,
+            "saturation": 0.26864529750859883,
+            "textLikelihood": 0.007575757575757576,
+            "cornerTextLikelihood": 0.054222093695777906,
+            "hudLikelihood": 0.18456760601527786,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar1xhu",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar1xhu.jpg",
+          "type": "ARTWORK",
+          "visualReview": {
+            "composition": "PROMOTIONAL_KEY_ART",
+            "reason": "Large character close-up composited over a forest scene; promotional montage rather than an in-scene hero."
+          },
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.14384332626634425,
+            "dynamicRange": 1,
+            "detailSpread": 0.25,
+            "focalRightBias": 0.4916444611139172,
+            "emptySpace": 0.75,
+            "overlayComplexity": 0.11926132850794002,
+            "overlayBrightness": 0.04543653678070485,
+            "saturation": 0.37165415608944563,
+            "textLikelihood": 0.017361111111111112,
+            "cornerTextLikelihood": 0,
+            "hudLikelihood": 0.06522743137544615,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "scixzd",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/scixzd.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 960,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.25967830055824787,
+            "dynamicRange": 1,
+            "detailSpread": 0.4722222222222222,
+            "focalRightBias": 0.6392167809603635,
+            "emptySpace": 0.5277777777777778,
+            "overlayComplexity": 0.21417558719467072,
+            "overlayBrightness": 0.18296413320555857,
+            "saturation": 0.5722756003164848,
+            "textLikelihood": 0.05366161616161616,
+            "cornerTextLikelihood": 0.05120975515712358,
+            "hudLikelihood": 0.0788038851252354,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "scixzc",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/scixzc.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.08128190879629633,
+            "dynamicRange": 1,
+            "detailSpread": 0.09722222222222221,
+            "focalRightBias": 0.6786380586774712,
+            "emptySpace": 0.9027777777777778,
+            "overlayComplexity": 0.17794779767736785,
+            "overlayBrightness": 0.1265341102934184,
+            "saturation": 0.2756739683845692,
+            "textLikelihood": 0.003787878787878788,
+            "cornerTextLikelihood": 0,
+            "hudLikelihood": 0,
+            "letterboxLikelihood": 0.010103914007970782
+          }
+        }
+      ]
+    },
+    {
+      "id": "317627",
+      "title": "Ghost of Yotei",
+      "playgroundHero": "sctzwq",
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co9coo.jpg",
+      "candidates": [
+        {
+          "id": "sctzwq",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sctzwq.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.388955161873666,
+            "dynamicRange": 1,
+            "detailSpread": 0.4305555555555556,
+            "focalRightBias": 0.3902871694009234,
+            "emptySpace": 0.5694444444444444,
+            "overlayComplexity": 0.17046347045596616,
+            "overlayBrightness": 0.3310960816146472,
+            "saturation": 0.36488951551317034,
+            "textLikelihood": 0.00789141414141414,
+            "cornerTextLikelihood": 0.012049354154617312,
+            "hudLikelihood": 0.07343901565527214,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar4u71",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar4u71.jpg",
+          "type": "ARTWORK",
+          "visualReview": {
+            "composition": "PROMOTIONAL_KEY_ART",
+            "reason": "Posed character under a large Ghost of Yotei logo; unsuitable for an automatic scene hero recommendation."
+          },
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.6886546102532847,
+            "dynamicRange": 1,
+            "detailSpread": 0.6458333333333333,
+            "focalRightBias": 0.4610607210185529,
+            "emptySpace": 0.3541666666666667,
+            "overlayComplexity": 0.43339201113242537,
+            "overlayBrightness": 0.4853354603197637,
+            "saturation": 0.2012112601594959,
+            "textLikelihood": 0.19476010101010102,
+            "cornerTextLikelihood": 0.054222093695777906,
+            "hudLikelihood": 0.023316488192155645,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "sctzwt",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sctzwt.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.33067075698529047,
+            "dynamicRange": 1,
+            "detailSpread": 0.5138888888888888,
+            "focalRightBias": 0.5378742164260658,
+            "emptySpace": 0.4861111111111111,
+            "overlayComplexity": 0.32212097366740344,
+            "overlayBrightness": 0.25952708915680217,
+            "saturation": 0.4082484629456224,
+            "textLikelihood": 0.06597222222222222,
+            "cornerTextLikelihood": 0.15965394254867937,
+            "hudLikelihood": 0.004038377197515701,
+            "letterboxLikelihood": 1
+          }
+        },
+        {
+          "id": "sctzws",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/sctzws.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.40307603510351037,
+            "dynamicRange": 1,
+            "detailSpread": 0.4305555555555556,
+            "focalRightBias": 0.32962479050490157,
+            "emptySpace": 0.5694444444444444,
+            "overlayComplexity": 0.16937073600315392,
+            "overlayBrightness": 0.33189022534943735,
+            "saturation": 0.2094520760635314,
+            "textLikelihood": 0.032512626262626264,
+            "cornerTextLikelihood": 0.183752650857914,
+            "hudLikelihood": 0.04656952638525366,
+            "letterboxLikelihood": 1
+          }
+        },
+        {
+          "id": "ar3o0f",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar3o0f.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null
+        }
+      ]
+    },
+    {
+      "id": "305152",
+      "title": "Clair Obscur: Expedition 33",
+      "playgroundHero": "scsoe7",
+      "posterUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co9gam.jpg",
+      "candidates": [
+        {
+          "id": "scsoe7",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/scsoe7.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.447674513194468,
+            "dynamicRange": 1,
+            "detailSpread": 0.5972222222222222,
+            "focalRightBias": 0.5124959846092203,
+            "emptySpace": 0.4027777777777778,
+            "overlayComplexity": 0.4133409855162759,
+            "overlayBrightness": 0.31614936073747396,
+            "saturation": 0.37271304554581647,
+            "textLikelihood": 0.04829545454545455,
+            "cornerTextLikelihood": 0.03614806246385194,
+            "hudLikelihood": 0,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar3nmf",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar3nmf.jpg",
+          "type": "ARTWORK",
+          "width": 1870,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.10411346711601215,
+            "dynamicRange": 1,
+            "detailSpread": 0.6041666666666667,
+            "focalRightBias": 0.46966571146873776,
+            "emptySpace": 0.3958333333333333,
+            "overlayComplexity": 0.2140949224948796,
+            "overlayBrightness": 0.07772200780859775,
+            "saturation": 0.08969213412274632,
+            "textLikelihood": 0.6319444444444444,
+            "cornerTextLikelihood": 0.5241469057258531,
+            "hudLikelihood": 0.21158017094559867,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "scsoeg",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/scsoeg.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.3370892985566476,
+            "dynamicRange": 1,
+            "detailSpread": 0.3402777777777778,
+            "focalRightBias": 0.6508730894162136,
+            "emptySpace": 0.6597222222222222,
+            "overlayComplexity": 0.24524769317261458,
+            "overlayBrightness": 0.4023566853758511,
+            "saturation": 0.39459271617619324,
+            "textLikelihood": 0.0101010101010101,
+            "cornerTextLikelihood": 0.009037015615962984,
+            "hudLikelihood": 0.041318621183882,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "scsoe2",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/scsoe2.jpg",
+          "type": "SCREENSHOT",
+          "width": 1920,
+          "height": 1080,
+          "signals": {
+            "broken": false,
+            "averageBrightness": 0.3412165312499981,
+            "dynamicRange": 0.8954,
+            "detailSpread": 0.22916666666666663,
+            "focalRightBias": 0.4628485311628866,
+            "emptySpace": 0.7708333333333334,
+            "overlayComplexity": 0.19926295895224175,
+            "overlayBrightness": 0.2168610902145795,
+            "saturation": 0.1647095809467498,
+            "textLikelihood": 0.0031565656565656565,
+            "cornerTextLikelihood": 0.027111046847888953,
+            "hudLikelihood": 0.04950733618714773,
+            "letterboxLikelihood": 0
+          }
+        },
+        {
+          "id": "ar3lza",
+          "url": "https://images.igdb.com/igdb/image/upload/t_1080p/ar3lza.jpg",
+          "type": "ARTWORK",
+          "width": null,
+          "height": null,
+          "signals": null
+        }
+      ]
+    }
+  ],
+  "screen": [
+    {
+      "id": "1377237",
+      "type": "MOVIE",
+      "title": "Runner",
+      "checkedAt": "2026-10-01T17:21:21.878Z",
+      "videos": [
+        {
+          "key": "m8JUmBgHejI",
+          "providerName": "Final Trailer",
+          "providerType": "Trailer",
+          "providerOfficial": true,
+          "title": "Runner | Final Trailer | 16+ | In Theaters Sep 11 | Alan Ritchson, Owen Wilson | Angel",
+          "available": true,
+          "duration": 143,
+          "width": 3840,
+          "height": 1608,
+          "channelId": null,
+          "playgroundReason": "PRIMARY_PROMO_FROM_KNOWN_SOURCE"
+        },
+        {
+          "key": "2ZfuX4IBTXM",
+          "providerName": "Official Teaser",
+          "providerType": "Teaser",
+          "providerOfficial": true,
+          "title": "Runner | Official Teaser | In Theaters Sep 11 | Angel",
+          "available": true,
+          "duration": 78,
+          "width": 3840,
+          "height": 1608,
+          "channelId": null,
+          "playgroundReason": "PRIMARY_PROMO_FROM_KNOWN_SOURCE"
+        },
+        {
+          "key": "B6Z9MM1LhEA",
+          "providerName": "UK Trailer",
+          "providerType": "Trailer",
+          "providerOfficial": true,
+          "title": null,
+          "available": false,
+          "duration": null,
+          "width": null,
+          "height": null,
+          "channelId": null,
+          "playgroundReason": "YOUTUBE_UNAVAILABLE"
+        },
+        {
+          "key": "otxjH3lrunU",
+          "providerName": "What if RUNNER was a K-drama?",
+          "providerType": "Teaser",
+          "providerOfficial": true,
+          "title": "What if RUNNER was a K-drama? 👀 🫰",
+          "available": true,
+          "duration": null,
+          "width": null,
+          "height": null,
+          "channelId": null,
+          "playgroundReason": "CANONICAL_TITLE_HAS_NO_PROMO_FORMAT"
+        }
+      ],
+      "posterUrl": null,
+      "recordedBackdropUrl": null
+    },
+    {
+      "id": "656908",
+      "type": "MOVIE",
+      "title": "Ramayana",
+      "checkedAt": "2026-10-01T17:21:21.878Z",
+      "videos": [
+        {
+          "key": "74nF-FWAS6M",
+          "providerName": "Official Trailer (English)",
+          "providerType": "Trailer",
+          "providerOfficial": true,
+          "title": "RAMAYANA - Official Trailer (English)",
+          "available": true,
+          "duration": 235,
+          "width": 1920,
+          "height": 1080,
+          "channelId": null,
+          "playgroundReason": "PRIMARY_PROMO_FROM_KNOWN_SOURCE"
+        },
+        {
+          "key": "1zip1rNaNYs",
+          "providerName": "Official Trailer",
+          "providerType": "Trailer",
+          "providerOfficial": true,
+          "title": "RAMAYANA - Official Trailer",
+          "available": true,
+          "duration": 250,
+          "width": 1920,
+          "height": 1080,
+          "channelId": null,
+          "playgroundReason": "PRIMARY_PROMO_FROM_KNOWN_SOURCE"
+        },
+        {
+          "key": "YleIZgpTF6w",
+          "providerName": "RAMA Glimpse",
+          "providerType": "Teaser",
+          "providerOfficial": false,
+          "title": "Rama | Namit Malhotra’s Ramayana | Nitesh Tiwari | Ranbir, Yash, Hans Zimmer & A.R. Rahman",
+          "available": true,
+          "duration": null,
+          "width": null,
+          "height": null,
+          "channelId": null,
+          "playgroundReason": "CANONICAL_TITLE_HAS_NO_PROMO_FORMAT"
+        },
+        {
+          "key": "8HiWKbDTc7w",
+          "providerName": "The Introduction",
+          "providerType": "Teaser",
+          "providerOfficial": false,
+          "title": "Namit Malhotra's Ramayana: The Introduction | Nitesh Tiwari | Ranbir, Yash, Hans Zimmer & AR Rahman",
+          "available": true,
+          "duration": 183,
+          "width": 3840,
+          "height": 2026,
+          "channelId": null,
+          "playgroundReason": "PRIMARY_PROMO_FROM_KNOWN_SOURCE"
+        }
+      ],
+      "posterUrl": "https://image.tmdb.org/t/p/original/lS17squIY8OpyFJz3cOCFzYxNUA.jpg",
+      "recordedBackdropUrl": "https://image.tmdb.org/t/p/original/svGHaToRKhlxwTBslsOxuntz0D7.jpg"
+    },
+    {
+      "id": "108978",
+      "type": "SERIES",
+      "title": "Reacher",
+      "checkedAt": "2026-10-01T17:21:21.878Z",
+      "videos": [
+        {
+          "key": "GSycMV-_Csw",
+          "providerName": "Official Trailer",
+          "providerType": "Trailer",
+          "providerOfficial": true,
+          "title": "Reacher - Official Trailer | Prime Video",
+          "available": true,
+          "duration": 136,
+          "width": 1920,
+          "height": 1080,
+          "channelId": null,
+          "playgroundReason": "PRIMARY_PROMO_FROM_KNOWN_SOURCE"
+        }
+      ],
+      "posterUrl": "https://image.tmdb.org/t/p/original/f1VCQIG2iCyOookdgOzwtUpwWC0.jpg",
+      "recordedBackdropUrl": "https://image.tmdb.org/t/p/original/pF0qkRsrHkdYadPWY9AMeFZfcwk.jpg",
+      "backdropReview": {
+        "composition": "PROMOTIONAL_PORTRAIT",
+        "width": 3840,
+        "height": 2160,
+        "method": "editorial-visual-review",
+        "reason": "Posed studio portrait on a red/blue background; prefer an in-scene hero."
+      }
+    },
+    {
+      "id": "108545",
+      "type": "SERIES",
+      "title": "3 Body Problem",
+      "checkedAt": "2026-10-01T17:21:21.878Z",
+      "videos": [
+        {
+          "key": "SdvzhCL7vIA",
+          "providerName": "Final Trailer",
+          "providerType": "Trailer",
+          "providerOfficial": true,
+          "title": "3 Body Problem | Final Trailer | Netflix",
+          "available": true,
+          "duration": 139,
+          "width": 1920,
+          "height": 1080,
+          "channelId": null,
+          "playgroundReason": "PRIMARY_PROMO_FROM_KNOWN_SOURCE"
+        },
+        {
+          "key": "5lj99Uz1d50",
+          "providerName": "Official Teaser",
+          "providerType": "Teaser",
+          "providerOfficial": true,
+          "title": "3 Body Problem | Official Teaser | Netflix",
+          "available": true,
+          "duration": 108,
+          "width": 1920,
+          "height": 1080,
+          "channelId": null,
+          "playgroundReason": "PRIMARY_PROMO_FROM_KNOWN_SOURCE"
+        },
+        {
+          "key": "dLMtjDQJZNE",
+          "providerName": "Trailer Experience at CES 2024",
+          "providerType": "Featurette",
+          "providerOfficial": true,
+          "title": "3 Body Problem: Trailer Experience at CES 2024 | Netflix",
+          "available": true,
+          "duration": 93,
+          "width": 1920,
+          "height": 1080,
+          "channelId": null,
+          "playgroundReason": "PRIMARY_PROMO_FROM_KNOWN_SOURCE"
+        }
+      ],
+      "posterUrl": null,
+      "recordedBackdropUrl": null
+    }
+  ]
+}
