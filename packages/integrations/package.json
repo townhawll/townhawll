@@ -16,6 +16,8 @@
     "./catalogue-candidates": "./src/catalogue-candidates.ts",
     "./game-candidates": "./src/game-candidates.ts",
     "./game-supplements": "./src/game-supplements.ts",
+    "./normalization": "./src/normalization/index.ts",
+    "./selection": "./src/selection/index.ts",
     "./steam": {
       "browser": null,
       "default": "./src/providers/steam/index.ts"

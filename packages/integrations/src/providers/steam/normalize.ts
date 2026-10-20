@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeName } from "../../normalization/text.js";
 
 import { field, known, missing } from "../../candidate-fields.js";
 import type { CandidateField, Provenance } from "../../contracts.js";
@@ -103,7 +104,7 @@ export function normalizeSteamApp(
   ]);
   return {
     identity,
-    name: field(raw.name?.trim() || null, source),
+    name: field(raw.name ? normalizeName(raw.name) || null : null, source),
     appType: types.get(raw.type.toLowerCase()) ?? "OTHER",
     sourceAppType: raw.type,
     requestedCountryCode: countryCode,

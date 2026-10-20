@@ -312,7 +312,8 @@ describe("IGDB pure normalization", () => {
     });
     expect(result.title).not.toHaveProperty("id");
     expect(result.title).not.toHaveProperty("slug");
-    expect(value(result.title.aliases)).toHaveLength(1);
+    // Both supplied alternatives are merely spellings of the canonical title.
+    expect(value(result.title.aliases)).toHaveLength(0);
     expect(value(result.game.themes)[0]?.identity).toMatchObject({
       entity: "theme",
       id: "1",
@@ -590,6 +591,8 @@ describe("IGDB pure normalization", () => {
     expect(value(result.title.certifications)).toMatchObject([
       { system: "ESRB", certification: "T", country: null },
       { system: "PEGI", certification: "12", country: null },
+      { system: "ESRB", certification: "12", country: null },
+      { system: "Unknown board", certification: "T", country: null },
     ]);
     expect(
       value(result.game.sourceRatings).map((rating) => rating.recognized),
@@ -604,7 +607,7 @@ describe("IGDB pure normalization", () => {
             rating_category: { rating: "18" },
           },
         ],
-      }).title.certifications,
+      }).title.ageRating,
     ).toMatchObject({ state: "missing", reason: "UNSUPPORTED" });
   });
   it("maps completion time units while retaining source seconds, sample count and timestamp", () => {
@@ -729,7 +732,10 @@ describe("IGDB pure normalization", () => {
       releaseStatus: "UNKNOWN",
       modes: { state: "missing" },
     });
-    expect(result.title.certifications).toMatchObject({
+    expect(value(result.title.certifications)).toMatchObject([
+      { system: "constructor", certification: "T" },
+    ]);
+    expect(result.title.ageRating).toMatchObject({
       state: "missing",
       reason: "UNSUPPORTED",
     });

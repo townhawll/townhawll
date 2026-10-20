@@ -28,3 +28,12 @@ export function field<T>(
     ? missing()
     : known(value, source);
 }
+
+export function mapField<T, U>(
+  input: CandidateField<T>,
+  map: (value: T) => U,
+): CandidateField<U> {
+  return input.state === "known"
+    ? { ...input, value: map(input.value) }
+    : input;
+}

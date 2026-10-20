@@ -10,6 +10,7 @@ import {
   titleCandidateSchema,
 } from "./contracts.js";
 import { providerIdentitySchema } from "./identity.js";
+import { catalogueRecommendationsSchema } from "./selection/contracts.js";
 
 const text = z.string().trim().min(1);
 const count = z.number().int().nonnegative();
@@ -105,6 +106,7 @@ const watchAvailabilitySchema = z.strictObject({
 /** Related references remain candidates; no placeholder TownHawll records are created. */
 export const titleDetailsCandidateSchema = z.strictObject({
   title: titleCandidateSchema,
+  recommendations: catalogueRecommendationsSchema.optional(),
   genres: candidateFieldSchema(z.array(taxonomySchema)),
   keywords: candidateFieldSchema(z.array(taxonomySchema)),
   credits: candidateFieldSchema(z.array(creditCandidateSchema)),

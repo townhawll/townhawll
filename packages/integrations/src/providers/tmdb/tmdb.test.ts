@@ -210,7 +210,11 @@ describe("TMDB title normalization", () => {
       { provider: "TMDB", providerId: "company:12" },
       { provider: "TMDB", providerId: "network:12" },
     ]);
-    expect(result.title.isAnime.state).toBe("missing");
+    expect(result.title.isAnime).toMatchObject({
+      state: "known",
+      value: true,
+      certainty: "INFERRED",
+    });
     expect(result.franchises).toEqual({
       state: "missing",
       reason: "UNSUPPORTED",
@@ -335,8 +339,22 @@ describe("TMDB title normalization", () => {
       name: "Kong",
       normalizedKey: "kong",
       languageCode: null,
-      countryCode: "US",
+      countryCode: null,
       sourceType: "Working title",
+      sourceVariants: [
+        {
+          name: "Kong",
+          countryCode: "US",
+          languageCode: null,
+          sourceType: "Working title",
+        },
+        {
+          name: "KONG",
+          countryCode: "GB",
+          languageCode: null,
+          sourceType: null,
+        },
+      ],
     });
   });
 

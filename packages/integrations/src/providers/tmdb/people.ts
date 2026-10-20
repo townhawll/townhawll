@@ -4,6 +4,11 @@ import type {
 } from "../../catalogue-candidates.js";
 import type { CandidateField, Provenance } from "../../contracts.js";
 import {
+  exactCalendarDate,
+  normalizeCreditCandidates,
+  normalizeName,
+} from "../../normalization/index.js";
+import {
   creditsSchema,
   imagesSchema,
   type TmdbPerson,
@@ -29,7 +34,7 @@ export function personReference(
   const source = provenance(identity, fetchedAt);
   return {
     identity,
-    name: person.name,
+    name: normalizeName(person.name),
     originalName: field(clean(person.original_name), source),
     biography: missing("NOT_REQUESTED"),
     birthday: missing("NOT_REQUESTED"),
@@ -59,8 +64,8 @@ export function normalizePerson(
     person: {
       ...reference,
       biography: field(clean(person.biography), reference.provenance),
-      birthday: field(clean(person.birthday), reference.provenance),
-      deathday: field(clean(person.deathday), reference.provenance),
+      birthday: field(exactCalendarDate(person.birthday), reference.provenance),
+      deathday: field(exactCalendarDate(person.deathday), reference.provenance),
       placeOfBirth: field(clean(person.place_of_birth), reference.provenance),
       detailStatus: "AVAILABLE",
       media: normalizeImages(
@@ -87,7 +92,7 @@ export function normalizeCredits(
   const combined = aggregateRequested
     ? section(creditsSchema, aggregate, "aggregate_credits", context)
     : missing("NOT_REQUESTED");
-  const credits = new Map<string, CreditCandidate>();
+  const credits: CreditCandidate[] = [];
   const people = new Map<string, PersonCandidate>();
   const addPerson = (person: TmdbPersonReference) => {
     const reference = personReference(person, source.fetchedAt);
@@ -97,17 +102,7 @@ export function normalizeCredits(
     return reference.identity;
   };
   const addCredit = (credit: CreditCandidate) => {
-    const key = JSON.stringify([
-      credit.personIdentity.id,
-      credit.type,
-      credit.characterName,
-      credit.job,
-      credit.department,
-      credit.providerCreditId,
-    ]);
-    const previous = credits.get(key);
-    if (!previous || (credit.episodeCount ?? 0) > (previous.episodeCount ?? 0))
-      credits.set(key, credit);
+    credits.push(credit);
   };
   for (const input of [combined, direct]) {
     if (input.state !== "known") continue;
@@ -168,8 +163,10 @@ export function normalizeCredits(
     });
   return {
     credits:
-      direct.state === "known" || combined.state === "known" || credits.size > 0
-        ? known([...credits.values()], source)
+      direct.state === "known" ||
+      combined.state === "known" ||
+      credits.length > 0
+        ? known(normalizeCreditCandidates(credits), source)
         : missing("UNAVAILABLE"),
     people: [...people.values()],
   };

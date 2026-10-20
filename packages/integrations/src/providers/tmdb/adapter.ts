@@ -1,4 +1,10 @@
 import { createLogger } from "@townhawll/observability/logger";
+import { validateNormalizationPolicy } from "../../normalization/ratings.js";
+import {
+  recommendCatalogueMedia,
+  validateSelectionPolicy,
+  type SelectionPolicy,
+} from "../../selection/index.js";
 
 import {
   personCandidateSchema,
@@ -47,13 +53,15 @@ const seriesAppend =
   "credits,aggregate_credits,keywords,alternative_titles,images,videos,content_ratings,watch/providers";
 
 export function createTmdbAdapter(
-  options: TmdbClientOptions = {},
+  options: TmdbClientOptions & { selection?: SelectionPolicy } = {},
   dependencies: {
     fetch?: typeof globalThis.fetch;
     now?: () => Date;
     logger?: Pick<ReturnType<typeof createLogger>, "warn">;
   } = {},
 ) {
+  const normalization = validateNormalizationPolicy(options.normalization);
+  const selection = validateSelectionPolicy(options.selection);
   const client = createTmdbClient(options, dependencies.fetch);
   const now = dependencies.now ?? (() => new Date());
   const logger = dependencies.logger ?? createLogger("integrations.tmdb");
@@ -179,7 +187,7 @@ export function createTmdbAdapter(
           ? await client.request(`movie/${id}`, params, movieSchema, signal)
           : await client.request(`tv/${id}`, params, seriesSchema, signal);
       assertResponseId(id, raw.id);
-      const candidate = normalizeTitle(raw, now().toISOString());
+      const candidate = normalizeTitle(raw, now().toISOString(), normalization);
       const enriched = await Promise.all(
         candidate.people
           .slice(0, values.peopleLimit)
@@ -231,11 +239,12 @@ export function createTmdbAdapter(
         (person) => enrichedPeople.get(person.identity.id) ?? person,
       );
       report(candidate.issues);
-      return validateProviderResponse(
-        "TMDB",
-        titleDetailsCandidateSchema,
-        candidate,
-      );
+      return validateProviderResponse("TMDB", titleDetailsCandidateSchema, {
+        ...candidate,
+        recommendations: recommendCatalogueMedia(candidate, {
+          policy: selection,
+        }),
+      });
     } catch (error) {
       if (values.signal?.aborted)
         throw new ProviderHttpError("TMDB", "CANCELLED");

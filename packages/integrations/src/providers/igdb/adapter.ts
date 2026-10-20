@@ -1,4 +1,10 @@
 import { createLogger } from "@townhawll/observability/logger";
+import { validateNormalizationPolicy } from "../../normalization/ratings.js";
+import {
+  recommendCatalogueMedia,
+  validateSelectionPolicy,
+  type SelectionPolicy,
+} from "../../selection/index.js";
 
 import {
   gameDetailsCandidateSchema,
@@ -24,13 +30,15 @@ import { completionsSchema, gamesSchema } from "./schemas.js";
 import { missing } from "./values.js";
 
 export function createIgdbAdapter(
-  options: IgdbClientOptions = {},
+  options: IgdbClientOptions & { selection?: SelectionPolicy } = {},
   dependencies: {
     fetch?: typeof globalThis.fetch;
     now?: () => Date;
     logger?: Pick<ReturnType<typeof createLogger>, "warn">;
   } = {},
 ) {
+  const normalization = validateNormalizationPolicy(options.normalization);
+  const selection = validateSelectionPolicy(options.selection);
   const now = dependencies.now ?? (() => new Date());
   const client = createIgdbClient(options, {
     ...(dependencies.fetch ? { fetch: dependencies.fetch } : {}),
@@ -77,7 +85,10 @@ export function createIgdbAdapter(
             : null,
         results: games
           .slice(0, values.limit)
-          .map((game) => normalizeGame(game, now().toISOString()).title),
+          .map(
+            (game) =>
+              normalizeGame(game, now().toISOString(), normalization).title,
+          ),
       });
     });
   }
@@ -95,7 +106,7 @@ export function createIgdbAdapter(
       const game = games[0];
       if (games.length !== 1 || !game || String(game.id) !== id)
         throw new ProviderHttpError("IGDB", "INVALID_RESPONSE");
-      const result = normalizeGame(game, now().toISOString());
+      const result = normalizeGame(game, now().toISOString(), normalization);
       const source = result.title.mappings[0];
       if (!source) throw new ProviderHttpError("IGDB", "INVALID_RESPONSE");
       if (values.includeCompletionTime) {
@@ -139,11 +150,10 @@ export function createIgdbAdapter(
           );
         }
       }
-      return validateProviderResponse(
-        "IGDB",
-        gameDetailsCandidateSchema,
-        result,
-      );
+      return validateProviderResponse("IGDB", gameDetailsCandidateSchema, {
+        ...result,
+        recommendations: recommendCatalogueMedia(result, { policy: selection }),
+      });
     });
   }
   return { searchGames, getGame };

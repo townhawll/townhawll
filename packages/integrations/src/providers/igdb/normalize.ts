@@ -6,6 +6,14 @@ import type {
 import type { GameDetailsCandidate } from "../../game-candidates.js";
 import type { ProviderIdentity } from "../../identity.js";
 import { media, videos } from "./media.js";
+import {
+  normalizeAliases,
+  normalizeCompanyReferences,
+  normalizeNamedReferences,
+  normalizeName,
+  selectAgeRating,
+  type NormalizationPolicy,
+} from "../../normalization/index.js";
 import { normalizeRatings } from "./ratings.js";
 import { gameType, relationships } from "./relations.js";
 import {
@@ -56,26 +64,24 @@ function modes(
 }
 function aliases(raw: IgdbGame, source: Provenance): GameTitle["aliases"] {
   if (raw.alternative_names == null) return missing();
-  const values = raw.alternative_names.flatMap((alias) => {
-    const name = clean(alias.name);
-    return name
-      ? [
-          {
-            name,
-            normalizedKey: name
-              .normalize("NFKC")
-              .toLowerCase()
-              .replace(/\s+/gu, " ")
-              .trim(),
-            languageCode: null,
-            sourceType: clean(alias.comment),
-            provenance: source,
-          },
-        ]
-      : [];
-  });
   return known(
-    [...new Map(values.map((alias) => [alias.normalizedKey, alias])).values()],
+    normalizeAliases(
+      raw.alternative_names.flatMap((alias) => {
+        const name = clean(alias.name);
+        return name
+          ? [
+              {
+                name,
+                normalizedKey: name,
+                languageCode: null,
+                sourceType: clean(alias.comment),
+                provenance: source,
+              },
+            ]
+          : [];
+      }),
+      [raw.name],
+    ),
     source,
   );
 }
@@ -98,6 +104,7 @@ function steamIdentities(
 export function normalizeGame(
   raw: IgdbGame,
   fetchedAt: string,
+  policy: NormalizationPolicy = {},
 ): GameDetailsCandidate {
   const source = provenance(
     identity("game", raw.id),
@@ -116,15 +123,19 @@ export function normalizeGame(
     entity: "genre" | "keyword" | "theme" | "franchise" | "collection",
     sourceField: string,
   ) {
-    return (refs ?? []).flatMap((ref) => {
-      const name = clean("name" in ref ? ref.name : null);
-      const id = identity(entity, ref.id);
-      if (!name) {
-        unresolvedReferences.push({ identity: id, sourceField });
-        return [];
-      }
-      return [{ identity: id, name, provenance: source }];
-    });
+    return normalizeNamedReferences(
+      (refs ?? []).flatMap((ref) => {
+        const name = clean("name" in ref ? ref.name : null);
+        const id = identity(entity, ref.id);
+        if (!name) {
+          unresolvedReferences.push({ identity: id, sourceField });
+          return [];
+        }
+        return [
+          { identity: id, name: normalizeName(name), provenance: source },
+        ];
+      }),
+    );
   }
   const genres = namedReferences(raw.genres, "genre", "genres");
   const keywords = namedReferences(raw.keywords, "keyword", "keywords");
@@ -172,7 +183,10 @@ export function normalizeGame(
       platformRefs.set(event.platform.id, event.platform);
   const platforms = [...platformRefs.values()].map((platform) => ({
     identity: identity("platform", platform.id),
-    name: field(clean("name" in platform ? platform.name : null), source),
+    name: field(
+      clean(normalizeName(("name" in platform ? platform.name : null) ?? "")),
+      source,
+    ),
     abbreviation: field(
       clean("abbreviation" in platform ? platform.abbreviation : null),
       source,
@@ -200,13 +214,14 @@ export function normalizeGame(
           }))
         : []),
     ],
-    title: raw.name,
+    title: normalizeName(raw.name),
     originalTitle: missing("UNSUPPORTED"),
     overview: field(clean(raw.summary), source),
     primaryReleaseDate: primary,
     isAnime: missing("UNSUPPORTED"),
     aliases: aliases(raw, source),
     certifications: ratings.certifications,
+    ageRating: selectAgeRating(ratings.certifications, "GAME", policy),
     media:
       raw.cover == null && raw.artworks == null && raw.screenshots == null
         ? missing()
@@ -228,17 +243,7 @@ export function normalizeGame(
     companies:
       raw.involved_companies == null
         ? missing()
-        : known(
-            [
-              ...new Map(
-                companies.map((company) => [
-                  `${company.identity.id}:${company.role}`,
-                  company,
-                ]),
-              ).values(),
-            ],
-            source,
-          ),
+        : known(normalizeCompanyReferences(companies), source),
     franchises:
       raw.franchises == null && raw.collections == null
         ? missing()

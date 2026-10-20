@@ -1,19 +1,13 @@
-import {
-  calendarDateSchema,
-  type CandidateField,
-  type Provenance,
-} from "../../contracts.js";
+import { type CandidateField, type Provenance } from "../../contracts.js";
 import type { GameReleaseCandidate } from "../../game-candidates.js";
 import type { IgdbGame, IgdbRelease } from "./schemas.js";
 import {
-  clean,
-  field,
-  identity,
-  key,
-  known,
-  missing,
-  timestamp,
-} from "./values.js";
+  inferGameReleaseStatus,
+  mapProvidedStatus,
+  normalizeReleaseDate,
+  releaseDateField,
+} from "../../normalization/dates.js";
+import { clean, identity, known, missing, timestamp } from "./values.js";
 
 type ReleaseDate = Extract<
   GameReleaseCandidate["date"],
@@ -36,10 +30,11 @@ export function releaseDate(
     return missing("UNAVAILABLE");
   if (!year || !format || format === "TBD")
     return missing(format === "TBD" ? "NOT_PROVIDED" : "UNSUPPORTED");
-  if (format === "YYYY") return known({ precision: "YEAR", year }, source);
+  if (format === "YYYY")
+    return releaseDateField({ precision: "YEAR", year }, source);
   const quarter = /^YYYYQ([1-4])$/.exec(format)?.[1];
   if (quarter)
-    return known(
+    return releaseDateField(
       { precision: "QUARTER", year, quarter: Number(quarter) },
       source,
     );
@@ -47,15 +42,14 @@ export function releaseDate(
   if (["YYYYMMMM", "YYYYMM"].includes(format) && month) {
     if (iso && raw.m && raw.m !== Number(iso.slice(5, 7)))
       return missing("UNAVAILABLE");
-    return known({ precision: "MONTH", year, month }, source);
+    return releaseDateField({ precision: "MONTH", year, month }, source);
   }
   if (["YYYYMMMMDD", "YYYYMMDD"].includes(format)) {
     const day = raw.d || (iso ? Number(iso.slice(8, 10)) : null);
     if (!month || !day) return missing();
     const date = `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
     if (iso && date !== iso.slice(0, 10)) return missing("UNAVAILABLE");
-    if (calendarDateSchema.safeParse(date).success)
-      return known({ precision: "DAY", date }, source);
+    if (normalizeReleaseDate(date)) return releaseDateField(date, source);
   }
   return missing("UNSUPPORTED");
 }
@@ -116,36 +110,17 @@ export function releaseStatus(
   date: CandidateField<ReleaseDate>,
   source: Provenance,
 ): CandidateField<ReleaseStatus> {
-  const status = clean(raw.game_status?.status);
-  if (status) {
-    const statuses: Record<string, ReleaseStatus> = {
-      released: "RELEASED",
-      upcoming: "UPCOMING",
-      delayed: "DELAYED",
-      cancelled: "CANCELLED",
-      canceled: "CANCELLED",
-      earlyaccess: "EARLY_ACCESS",
-    };
-    return known(
-      Object.hasOwn(statuses, key(status))
-        ? (statuses[key(status)] ?? "UNKNOWN")
-        : "UNKNOWN",
-      source,
-    );
-  }
-  if (date.state === "known" && date.value.precision === "DAY") {
-    return {
-      ...known<ReleaseStatus>(
-        date.value.date <= source.fetchedAt.slice(0, 10)
-          ? "RELEASED"
-          : "UPCOMING",
-        source,
-      ),
-      certainty: "INFERRED",
-      evidence: [
-        "No explicit game status; compared the precision-verified first release day with the fetch date.",
-      ],
-    };
-  }
-  return field<ReleaseStatus>(null, source);
+  const statuses = new Map<string, ReleaseStatus>([
+    ["released", "RELEASED"],
+    ["upcoming", "UPCOMING"],
+    ["delayed", "DELAYED"],
+    ["cancelled", "CANCELLED"],
+    ["canceled", "CANCELLED"],
+    ["earlyaccess", "EARLY_ACCESS"],
+  ]);
+  return inferGameReleaseStatus(
+    mapProvidedStatus(raw.game_status?.status, statuses, "UNKNOWN", source),
+    date,
+    source,
+  );
 }

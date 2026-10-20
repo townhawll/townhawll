@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { NormalizationPolicy } from "../../normalization/ratings.js";
 
 import { loadIgdbEnvironment } from "../../config.js";
 import {
@@ -10,6 +11,7 @@ import {
 import { createTwitchTokenProvider } from "./twitch.js";
 
 export type IgdbClientOptions = {
+  normalization?: NormalizationPolicy;
   credentials?: { clientId: string; clientSecret: string };
   http?: Omit<ProviderHttpOptions, "provider" | "baseUrl">;
 };

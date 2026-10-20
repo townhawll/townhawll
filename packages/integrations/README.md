@@ -12,9 +12,10 @@ validated TownHawll candidate. Keep future provider DTOs inside their adapter.
 Selection is a separate pure operation. Candidates are not database inputs and
 must not be automatically published. Public catalogue pages use stored data.
 
-- Root, `/contracts` and `/identity` exports are pure. `/http` and `/config` are
-  server entry points, excluded by the browser export condition. Never import
-  these privileged entry points from a client component.
+- Root, `/contracts`, `/identity`, `/normalization` and `/selection` exports are
+  pure. `/http` and `/config` are server entry points, excluded by the browser
+  export condition. Never import these privileged entry points from a client
+  component.
 - `/config` reuses `@townhawll/config/server-env`. Credentials are validated
   lazily per provider: `TMDB_ACCESS_TOKEN`, `IGDB_CLIENT_ID` and
   `IGDB_CLIENT_SECRET`, or `STEAM_API_KEY` for authenticated Web API calls.
@@ -74,6 +75,162 @@ Run `pnpm --filter @townhawll/integrations test`, `lint` or `typecheck`. Like
 other source packages, integrations is compiled by consuming applications; it
 does not need its own emitted build or custom Turbo task.
 
+## Shared normalization
+
+`src/normalization` contains deterministic alias, certification, date/status,
+anime, code and reference helpers. Import them from
+`@townhawll/integrations/normalization`. They perform no I/O and never produce
+Prisma inputs, accepted taxonomy or canonical entity IDs. Adapters retain their
+own provider status vocabulary, date-format interpretation and relationship
+directions; Steam remains supplementary and never overwrites IGDB metadata.
+
+- Alias comparison uses NFKC, Unicode letters/numbers/combining marks,
+  normalized spacing and punctuation. Trademarks are removed before
+  compatibility folding. Canonical titles, executable/file labels, placeholders
+  and obvious noise are excluded. Multilingual alternatives and romanizations
+  remain eligible. When duplicate keys have differing
+  names/languages/regions/types, `sourceVariants` preserves those variants;
+  conflicting language/region values remain null on the merged alias. Neither
+  script nor country proves a language.
+- Raw `certifications` retain original labels, including blank/unrated and
+  unsupported classifications, regional context and provenance. The optional
+  `title.ageRating` contract adds a separate derived field; current TMDB/IGDB
+  detail adapters populate it. It is inferred, never provider-approved or a
+  legal age gate. Supported MPA, CBFC, US TV, BBFC, ESRB, PEGI, CERO, USK, GRAC,
+  ClassInd, ACB and FSK labels map explicitly to the catalogue's coarse display
+  buckets (`All ages`, `7+`, `13+`, `16+`, `18+`). Intermediate numeric
+  thresholds round upward to an available bucket. Advisory labels use explicit
+  editorial mappings; systems are not interchangeable. Legacy CBFC `UA`/`U/A`,
+  specialist `S`, pending/unrated labels and unsupported systems remain unknown.
+  No general digit extraction or default-to-all-ages rule is used.
+- Configure
+  `{ normalization: { preferredMarket: "IN", fallbackMarkets: ["US", "GB"] } }`
+  on `createTmdbAdapter` or `createIgdbAdapter`. There is **no implicit
+  preferred market**. Selection checks the configured markets in order, then
+  supported certifications elsewhere. Within a market, explicit region evidence
+  precedes known game-board territory associations; the highest bucket resolves
+  conflicts, with stable source-based ties. Associations do not fabricate a
+  country release. For a narrowly supported screen region/domain, a missing
+  board may be inferred in the derived selection; the original system stays
+  null. An explicit unsupported board is never replaced by this inference.
+- Dates retain DAY/MONTH/QUARTER/YEAR precision. Partial dates and arbitrary
+  timestamps never become exact days. Explicit statuses, including unknown
+  provider labels, take precedence. Game inference requires an exact first
+  release day and compares it with the fixed UTC fetch date, marking evidence
+  and certainty separately from the original provider status.
+- Anime requires Animation plus either an explicit anime keyword or Japanese
+  original language **and** Japanese origin. Animation alone stays uncertain;
+  conflicting genre/keyword evidence stays unsupported. Results are inferred.
+  Language/country helpers normalize well-formed codes and explicit common
+  aliases; they are not a complete ISO registry. Spoken-language lists never
+  establish verified dubbing, which remains unsupported in these adapters.
+- Credits preserve scoped person IDs, characters, jobs, departments and credit
+  IDs. Only exact duplicates merge; role-specific credits remain distinct.
+  Company roles and provider entity scopes remain separate. Named references
+  normalize whitespace without fuzzy identity matching or taxonomy approval.
+  Explicit directed relationships retain source fields and external identities;
+  they never cause placeholder title creation.
+
+Rating semantics are checked against the official
+[MPA](https://www.filmratings.com/),
+[CBFC](https://cbfcindia.gov.in/cbfcAdmin/faq.php),
+[ESRB](https://www.esrb.org/ratings-guide/) and
+[CERO](https://www.cero.gr.jp/en/publics/index/17/) guidance. Bucket selection
+is TownHawll policy; original classifications remain available for admin review.
+Media/banner ranking and video selection remain separate operations.
+
+## Media and video recommendations
+
+TMDB and IGDB detail adapters attach an optional `recommendations` envelope with
+`poster`, `hero` and `video` results. Search remains lightweight. Each result
+contains a `recommended` suggestion (or null), eligible `alternatives`,
+`rejected` references with reason codes, duplicate references and the source
+availability state. Assessments preserve the original candidate, score factors,
+warnings and an explanation. The raw media/video arrays remain unchanged.
+
+The pure `/selection` export also supports independent re-evaluation:
+
+```ts
+import { recommendCatalogueMedia } from "@townhawll/integrations/selection";
+
+const recommendations = recommendCatalogueMedia(candidate, {
+  policy: { preferredLanguages: ["en", "hi"] },
+});
+// recommendations.poster.recommended?.candidate
+// recommendations.hero.alternatives
+// recommendations.video.rejected
+```
+
+- Eligibility checks provider origins, exact mapped ownership, source type and
+  technical geometry. Covers recommend `POSTER`; banners recommend `HERO_ART`.
+  Provider `SCREENSHOT` remains a candidate source classification, never a new
+  database purpose. Unknown dimensions remain eligible for inspection but cannot
+  be auto-recommended. Known heroes need at least 960 × 540 and a 1.5–2.4 ratio;
+  screen posters need 200 × 300. Legacy square game covers remain eligible.
+- Game heroes adapt the playground's scene-first ranker. Geometry is capped;
+  screenshots receive a modest eight-point scene prior. Composition, exposure,
+  overlay readability, measured text/HUD and cover resemblance determine the
+  rest. Clean artwork can beat cluttered gameplay. Screen heroes favor natural
+  scenes and language-neutral imagery; posters prefer useful geometry and
+  requested/original-language versions. Provider votes/primary flags are small
+  hints. Ties use stable identities rather than provider order.
+- Text, HUD and composition heuristics lower rankings without technically
+  rejecting valid images. A hero below score 20 or dominated by measured
+  text/HUD requires manual review and receives no automatic recommendation.
+  Every other eligible reference remains selectable. Confirmed Steam screenshots
+  can be fallback suggestions only when no recommendable IGDB image exists.
+- An explicit `PROMOTIONAL_PORTRAIT`, `PROMOTIONAL_KEY_ART` or `LOGO_CARD`
+  composition assessment also makes a hero manual-only, even if no better
+  alternative exists. Prefer an in-scene backdrop over a posed studio promo,
+  character montage or logo card. Clean scene artwork remains recommendable.
+  This assessment must come from actual visual review/analysis; dimensions, URLs
+  and title names do not establish it.
+- Optional `evidence.media` accepts keyed, externally measured signals through
+  `mediaCandidateKey`, including the analysis method. This module does **not**
+  download images, perform OCR/pixel analysis, extract video frames or run
+  Sharp. Without signals, scores are explicitly metadata-only and request
+  inspection; they cannot establish semantic scene quality or reliably detect
+  embedded text.
+- Video classification preserves specific trailer/teaser/gameplay/promotional
+  labels. Phrase boundaries avoid `preview`/`review` mistakes. Exclusions cover
+  unrelated titles, fan/concept edits, diaries, soundtracks, full playthroughs,
+  base-game DLC promos and independently established technical failures. A DLC
+  may still use its own trailer. External keys deduplicate across provider
+  records.
+- `evidence.videos` accepts externally obtained metadata bound to the exact
+  video key and reference URL. Independently obtained titles override provider
+  labels. Trusted uploader matching uses explicitly configured YouTube channel
+  IDs, never display names or self-declared “official” titles. `PROVIDER_API`
+  evidence is still a provider claim. No YouTube API client, watch-page scraper,
+  channel registry or verification service is introduced here.
+- Verified-title recommendations require a matching title, relevant promo
+  format, available source and trusted uploader. A specifically named official
+  TMDB promo can be a provisional provider-only suggestion with explicit
+  warnings. Unverified generic IGDB/TMDB labels remain reviewable, with no
+  automatic primary recommendation. If an independently inspected title has no
+  supported promotional format, the video is rejected even when the provider
+  calls it an official teaser. Trailer → teaser → gameplay → other promo
+  supplies the fallback order.
+- Explicit per-video audio metadata has more weight than title/provider hints.
+  Subtitle labels and language words inside a title never establish spoken
+  audio. oEmbed iframe dimensions/duration are never treated as native
+  measurements. Metadata snapshots do not guarantee present or worldwide
+  playback availability.
+
+Evidence must come from trusted server orchestration, not an unvalidated browser
+payload. Work is bounded to 2,000 image references, 500 videos, 24 visual
+inspections and 100 video metadata snapshots per call; excess or malformed
+evidence fails explicitly. Selectors make no network calls. Optional factory
+`selection` policy supports language/channel preferences; per-title evidence is
+supplied to the independent selector to avoid hidden enrichment requests.
+
+These are suggestions, not editorial acceptance, processing readiness or active
+media. Later import validation must recheck ownership, permissions, source
+safety and the final admin selection before retaining or processing anything.
+
+The [representative fixture notes](src/selection/fixtures/README.md) describe
+the bounded replay, visual comparisons and remaining subjective cases.
+
 ## TMDB
 
 Import the server-only entry point and reuse the adapter per credential scope:
@@ -113,7 +270,8 @@ Provider schemas and pure normalization remain inside `src/providers/tmdb`. The
 envelope also retains source status, spoken-language codes, episode-runtime
 values and provider popularity for later review. Video metadata and image paths,
 dimensions, provider language, primary flags and vote signals remain candidates.
-No candidate is ranked, accepted, downloaded or activated.
+Raw candidates are not mutated or accepted, downloaded or activated.
+Recommendations are evaluated separately after normalization.
 
 Calendar dates stay date-only. New/unknown statuses remain `UNKNOWN`, with the
 original status preserved. Series runtime is the rounded mean of positive
@@ -121,8 +279,8 @@ original status preserved. Series runtime is the rounded mean of positive
 Spoken languages do not prove dubbed releases; dubbing and verified video audio
 stay unknown. Certification values, countries and release-event context are
 preserved; TMDB does not normally identify an authority system, so it remains
-null rather than being guessed from country alone. Effective certification/age
-selection and anime classification remain separate normalization policies.
+null in the raw evidence. The shared normalization policy separately derives
+effective certification/age selection and evidence-based anime classification.
 
 Detail language is optional. Supplying a language can filter TMDB images/videos;
 use `imageLanguages`, such as `["en", "ja", "null"]`, to expand image coverage.
@@ -197,8 +355,8 @@ Provider DTOs are private to `src/providers/igdb`.
 - Certifications preserve authority-specific labels. Unsupported boards/labels
   remain raw evidence with no fabricated normalized certification. Country is
   unknown where the rating record does not provide it; a regional board is not
-  evidence of a particular country release. Effective age/certification policy
-  remains separate.
+  evidence of a particular country release. Shared age selection is exposed
+  separately as `title.ageRating`; it never replaces the raw classifications.
 - Completion values retain seconds, submission count and update time. IGDB's
   documented definitions support main-story (`hastily`), main-plus-extra
   (`normally`) and completionist (`completely`) values. Conversion to rounded
@@ -298,5 +456,5 @@ normalization, text parsing and orchestration are separate modules.
 - Requirements carry source and provenance with `fetchedAt`. Steam supplies no
   requirement update timestamp here, so `sourceUpdatedAt` remains null.
 
-Shared policy refinement and editorial acceptance/persistence remain separate;
-this adapter does not write Prisma records or merge approved canonical fields.
+Editorial acceptance/persistence remains separate; this adapter does not write
+Prisma records or merge approved canonical fields.

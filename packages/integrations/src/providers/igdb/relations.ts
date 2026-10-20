@@ -1,6 +1,7 @@
 import type { Provenance } from "../../contracts.js";
 import type { GameRelationshipCandidate } from "../../game-candidates.js";
 import type { IgdbGame, IgdbReference } from "./schemas.js";
+import { normalizeRelationshipCandidates } from "../../normalization/references.js";
 import { clean, field, identity, key, known, missing } from "./values.js";
 
 type GameType = Extract<
@@ -92,13 +93,7 @@ export function relationships(raw: IgdbGame, source: Provenance) {
     add(raw.version_parent, "EDITION", "version_parent", false);
   }
   // Keep distinct source fields as evidence. Never infer sequels from names/similar_games/collection order.
-  const deduplicated = [
-    ...new Map(
-      result.map((value) => [
-        `${value.sourceIdentity.id}:${value.targetIdentity.id}:${value.type}:${value.sourceField}`,
-        value,
-      ]),
-    ).values(),
-  ];
-  return present ? known(deduplicated, source) : missing();
+  return present
+    ? known(normalizeRelationshipCandidates(result), source)
+    : missing();
 }

@@ -73,7 +73,8 @@ export const releaseDateSchema = z.discriminatedUnion("precision", [
 ]);
 
 export const certificationSchema = z.strictObject({
-  certification: text,
+  // Raw evidence includes blank/unrated provider values; selection interprets it separately.
+  certification: z.string(),
   system: text.nullable(),
   country: country.nullable(),
   provenance: provenanceSchema,
@@ -81,6 +82,13 @@ export const certificationSchema = z.strictObject({
   sourceReleaseDate: z.string().nullable().optional(),
   note: z.string().nullable().optional(),
   languageCode: language.nullable().optional(),
+});
+
+export const ageRatingSelectionSchema = z.strictObject({
+  normalizedAgeRating: z.enum(["All ages", "7+", "13+", "16+", "18+"]),
+  effectiveCertification: text,
+  effectiveCertificationSystem: text,
+  effectiveCertificationCountry: country.nullable(),
 });
 
 const mediaOwnerSchema = z
@@ -182,6 +190,16 @@ export const aliasCandidateSchema = z.strictObject({
   provenance: provenanceSchema,
   countryCode: country.nullable().optional(),
   sourceType: z.string().nullable().optional(),
+  sourceVariants: z
+    .array(
+      z.strictObject({
+        name: text,
+        languageCode: language.nullable(),
+        countryCode: country.nullable(),
+        sourceType: z.string().nullable(),
+      }),
+    )
+    .optional(),
 });
 
 const movieSchema = z.strictObject({
@@ -253,6 +271,7 @@ const titleBase = z.strictObject({
   isAnime: candidateFieldSchema(z.boolean()),
   aliases: candidateFieldSchema(z.array(aliasCandidateSchema)),
   certifications: candidateFieldSchema(z.array(certificationSchema)),
+  ageRating: candidateFieldSchema(ageRatingSelectionSchema).optional(),
   media: candidateFieldSchema(z.array(mediaCandidateSchema)),
   videos: candidateFieldSchema(z.array(videoCandidateSchema)),
 });

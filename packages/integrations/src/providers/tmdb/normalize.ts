@@ -14,6 +14,19 @@ import {
 import { normalizeImages, normalizeVideos } from "./media.js";
 import { normalizeCredits } from "./people.js";
 import {
+  classifyAnime,
+  exactCalendarDate,
+  mapProvidedStatus,
+  normalizeAliases as sharedAliases,
+  normalizeCodes,
+  normalizeCompanyReferences,
+  normalizeNamedReferences,
+  normalizeName,
+  releaseDateField,
+  selectAgeRating,
+  type NormalizationPolicy,
+} from "../../normalization/index.js";
+import {
   aliasesSchema,
   contentRatingsSchema,
   imagesSchema,
@@ -41,13 +54,6 @@ import {
   type NormalizationContext,
 } from "./values.js";
 
-function aliasKey(value: string): string {
-  return value
-    .normalize("NFKC")
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim();
-}
 function normalizeAliases(
   raw: unknown,
   names: string[],
@@ -55,27 +61,25 @@ function normalizeAliases(
 ) {
   return mapField(
     section(aliasesSchema, raw, "alternative_titles", context),
-    (data) => {
-      const seen = new Set(names.map(aliasKey));
-      return ("titles" in data ? data.titles : data.results).flatMap(
-        (alias) => {
+    (data) =>
+      sharedAliases(
+        ("titles" in data ? data.titles : data.results).flatMap((alias) => {
           const name = clean(alias.title);
-          const key = name ? aliasKey(name) : "";
-          if (!name || !key || seen.has(key)) return [];
-          seen.add(key);
-          return [
-            {
-              name,
-              normalizedKey: key,
-              languageCode: null,
-              countryCode: country(alias.iso_3166_1),
-              sourceType: clean(alias.type),
-              provenance: context.provenance,
-            },
-          ];
-        },
-      );
-    },
+          return name
+            ? [
+                {
+                  name,
+                  normalizedKey: name,
+                  languageCode: language(alias.iso_639_1),
+                  countryCode: country(alias.iso_3166_1),
+                  sourceType: clean(alias.type),
+                  provenance: context.provenance,
+                },
+              ]
+            : [];
+        }),
+        names,
+      ),
   );
 }
 
@@ -83,31 +87,23 @@ function normalizeCertifications(
   data: TmdbMovie | TmdbSeries,
   context: NormalizationContext,
 ) {
-  if ("title" in data) {
+  if ("title" in data)
     return mapField(
       section(releaseDatesSchema, data.release_dates, "release_dates", context),
       (value) =>
         value.results.flatMap((region) =>
-          region.release_dates.flatMap((release) => {
-            const certification = clean(release.certification);
-            return certification
-              ? [
-                  {
-                    certification,
-                    system: clean(release.system),
-                    country: country(region.iso_3166_1),
-                    releaseType: release.type ?? null,
-                    sourceReleaseDate: release.release_date ?? null,
-                    note: release.note ?? null,
-                    languageCode: language(release.iso_639_1),
-                    provenance: context.provenance,
-                  },
-                ]
-              : [];
-          }),
+          region.release_dates.map((release) => ({
+            certification: release.certification,
+            system: clean(release.system),
+            country: country(region.iso_3166_1),
+            releaseType: release.type ?? null,
+            sourceReleaseDate: release.release_date ?? null,
+            note: release.note ?? null,
+            languageCode: language(release.iso_639_1),
+            provenance: context.provenance,
+          })),
         ),
     );
-  }
   return mapField(
     section(
       contentRatingsSchema,
@@ -116,19 +112,12 @@ function normalizeCertifications(
       context,
     ),
     (value) =>
-      value.results.flatMap((rating) => {
-        const certification = clean(rating.rating);
-        return certification
-          ? [
-              {
-                certification,
-                system: clean(rating.system),
-                country: country(rating.iso_3166_1),
-                provenance: context.provenance,
-              },
-            ]
-          : [];
-      }),
+      value.results.map((rating) => ({
+        certification: rating.rating,
+        system: clean(rating.system),
+        country: country(rating.iso_3166_1),
+        provenance: context.provenance,
+      })),
   );
 }
 
@@ -195,8 +184,8 @@ function normalizeSeasons(
       identity,
       seriesIdentity: context.provenance.identity,
       seasonNumber: season.season_number,
-      name: clean(season.name),
-      airDate: field(clean(season.air_date), source),
+      name: season.name ? normalizeName(season.name) : null,
+      airDate: field(exactCalendarDate(season.air_date), source),
       episodeCount: field(season.episode_count, source),
       media: normalizeImages(
         known({ posters: [] }, source),
@@ -211,40 +200,50 @@ function normalizeSeasons(
 }
 
 function movieStatus(
-  status: string | null | undefined,
+  raw: string | null | undefined,
+  source: Provenance,
 ): Extract<TitleCandidate, { type: "MOVIE" }>["metadata"]["status"] {
-  switch (status) {
-    case "Planned":
-      return "PLANNED";
-    case "In Production":
-      return "IN_PRODUCTION";
-    case "Post Production":
-      return "POST_PRODUCTION";
-    case "Released":
-      return "RELEASED";
-    case "Canceled":
-      return "CANCELED";
-    default:
-      return "UNKNOWN";
-  }
+  type Status = Extract<
+    TitleCandidate,
+    { type: "MOVIE" }
+  >["metadata"]["status"];
+  const status = mapProvidedStatus<Status>(
+    raw,
+    new Map([
+      ["planned", "PLANNED"],
+      ["inproduction", "IN_PRODUCTION"],
+      ["postproduction", "POST_PRODUCTION"],
+      ["released", "RELEASED"],
+      ["canceled", "CANCELED"],
+      ["cancelled", "CANCELED"],
+    ]),
+    "UNKNOWN",
+    source,
+  );
+  return status.state === "known" ? status.value : "UNKNOWN";
 }
 function seriesStatus(
-  status: string | null | undefined,
+  raw: string | null | undefined,
+  source: Provenance,
 ): Extract<TitleCandidate, { type: "SERIES" }>["metadata"]["status"] {
-  switch (status) {
-    case "Returning Series":
-      return "RETURNING";
-    case "Ended":
-      return "ENDED";
-    case "Canceled":
-      return "CANCELED";
-    case "In Production":
-      return "IN_PRODUCTION";
-    case "Planned":
-      return "PLANNED";
-    default:
-      return "UNKNOWN";
-  }
+  type Status = Extract<
+    TitleCandidate,
+    { type: "SERIES" }
+  >["metadata"]["status"];
+  const status = mapProvidedStatus<Status>(
+    raw,
+    new Map([
+      ["returningseries", "RETURNING"],
+      ["ended", "ENDED"],
+      ["canceled", "CANCELED"],
+      ["cancelled", "CANCELED"],
+      ["inproduction", "IN_PRODUCTION"],
+      ["planned", "PLANNED"],
+    ]),
+    "UNKNOWN",
+    source,
+  );
+  return status.state === "known" ? status.value : "UNKNOWN";
 }
 function episodeRuntime(
   values: number[] | null | undefined,
@@ -270,12 +269,13 @@ function episodeRuntime(
 export function normalizeTitle(
   data: TmdbMovie | TmdbSeries,
   fetchedAt: string,
+  policy: NormalizationPolicy = {},
 ): TitleDetailsCandidate {
   const movie = "title" in data;
   const identity = tmdbIdentity(movie ? "movie" : "series", data.id);
   const source = provenance(identity, fetchedAt);
   const context: NormalizationContext = { provenance: source, issues: [] };
-  const name = movie ? data.title : data.name;
+  const name = normalizeName(movie ? data.title : data.name);
   const original = clean(movie ? data.original_title : data.original_name);
   const credits = normalizeCredits(
     data.credits,
@@ -284,28 +284,81 @@ export function normalizeTitle(
     context,
     !movie,
   );
+  const genres = field(
+    data.genres
+      ? normalizeNamedReferences(
+          data.genres.map((genre) => ({
+            identity: tmdbIdentity("genre", genre.id),
+            name: genre.name,
+            provenance: source,
+          })),
+        )
+      : null,
+    source,
+  );
+  const keywords = mapField(
+    section(keywordsSchema, data.keywords, "keywords", context),
+    (value) =>
+      normalizeNamedReferences(
+        ("keywords" in value ? value.keywords : value.results).map(
+          (keyword) => ({
+            identity: tmdbIdentity("keyword", keyword.id),
+            name: keyword.name,
+            provenance: source,
+          }),
+        ),
+      ),
+  );
+  const certifications = normalizeCertifications(data, context);
+  const originalLanguage = field(language(data.original_language), source);
+  const countries = movie
+    ? field(
+        data.production_countries
+          ? normalizeCodes(
+              data.production_countries.map((value) => value.iso_3166_1),
+              country,
+            )
+          : null,
+        source,
+      )
+    : field(
+        data.origin_country
+          ? normalizeCodes(data.origin_country, country)
+          : null,
+        source,
+      );
   const base = {
     identity,
     mappings: [source],
     title: name,
     originalTitle: field(original, source),
     overview: field(clean(data.overview), source),
-    primaryReleaseDate: clean(movie ? data.release_date : data.first_air_date)
-      ? known(
-          {
-            precision: "DAY" as const,
-            date: (movie ? data.release_date : data.first_air_date) ?? "",
-          },
-          source,
-        )
-      : missing(),
-    isAnime: missing("UNSUPPORTED"),
+    primaryReleaseDate: releaseDateField(
+      movie ? data.release_date : data.first_air_date,
+      source,
+    ),
+    isAnime: classifyAnime(
+      {
+        genres: mapField(genres, (values) => values.map((value) => value.name)),
+        keywords: mapField(keywords, (values) =>
+          values.map((value) => value.name),
+        ),
+        originalLanguage,
+        countries,
+      },
+      source,
+    ),
     aliases: normalizeAliases(
       data.alternative_titles,
       [name, original ?? name],
       context,
     ),
-    certifications: normalizeCertifications(data, context),
+    certifications,
+    ageRating: selectAgeRating(
+      certifications,
+      movie ? "MOVIE" : "SERIES",
+      policy,
+    ),
     media: normalizeImages(
       section(imagesSchema, data.images, "images", context),
       { kind: "TITLE", identity },
@@ -322,36 +375,28 @@ export function normalizeTitle(
         ...base,
         type: "MOVIE",
         metadata: {
-          status: movieStatus(data.status),
+          status: movieStatus(data.status, source),
           runtimeMinutes: field(
             data.runtime && data.runtime > 0 ? data.runtime : null,
             source,
           ),
-          originalLanguageCode: field(language(data.original_language), source),
+          originalLanguageCode: originalLanguage,
           dubbedLanguageCodes: missing("UNSUPPORTED"),
-          productionCountryCodes: field(
-            data.production_countries?.flatMap(
-              (value) => country(value.iso_3166_1) ?? [],
-            ),
-            source,
-          ),
+          productionCountryCodes: countries,
         },
       }
     : {
         ...base,
         type: "SERIES",
         metadata: {
-          status: seriesStatus(data.status),
-          lastAirDate: field(clean(data.last_air_date), source),
+          status: seriesStatus(data.status, source),
+          lastAirDate: field(exactCalendarDate(data.last_air_date), source),
           averageEpisodeRuntime: episodeRuntime(data.episode_run_time, source),
           numberOfSeasons: field(data.number_of_seasons, source),
           numberOfEpisodes: field(data.number_of_episodes, source),
-          originalLanguageCode: field(language(data.original_language), source),
+          originalLanguageCode: originalLanguage,
           dubbedLanguageCodes: missing("UNSUPPORTED"),
-          originCountryCodes: field(
-            data.origin_country?.flatMap((value) => country(value) ?? []),
-            source,
-          ),
+          originCountryCodes: countries,
         },
       };
   const companies: Extract<
@@ -377,31 +422,14 @@ export function normalizeTitle(
   }
   return {
     title,
-    genres: field(
-      data.genres?.map((genre) => ({
-        identity: tmdbIdentity("genre", genre.id),
-        name: genre.name,
-        provenance: source,
-      })),
-      source,
-    ),
-    keywords: mapField(
-      section(keywordsSchema, data.keywords, "keywords", context),
-      (value) =>
-        ("keywords" in value ? value.keywords : value.results).map(
-          (keyword) => ({
-            identity: tmdbIdentity("keyword", keyword.id),
-            name: keyword.name,
-            provenance: source,
-          }),
-        ),
-    ),
+    genres,
+    keywords,
     ...credits,
     companies:
       (data.production_companies !== undefined &&
         data.production_companies !== null) ||
       (!movie && data.networks !== undefined && data.networks !== null)
-        ? known(companies, source)
+        ? known(normalizeCompanyReferences(companies), source)
         : missing(),
     franchises: movie
       ? data.belongs_to_collection === undefined
@@ -414,7 +442,7 @@ export function normalizeTitle(
                       "collection",
                       data.belongs_to_collection.id,
                     ),
-                    name: data.belongs_to_collection.name,
+                    name: normalizeName(data.belongs_to_collection.name),
                     provenance: source,
                   },
                 ]
@@ -426,9 +454,12 @@ export function normalizeTitle(
     watchProviders: normalizeWatchProviders(data["watch/providers"], context),
     sourceStatus: field(clean(data.status), source),
     sourceSpokenLanguageCodes: field(
-      data.spoken_languages?.flatMap(
-        (value) => language(value.iso_639_1) ?? [],
-      ),
+      data.spoken_languages
+        ? normalizeCodes(
+            data.spoken_languages.map((value) => value.iso_639_1),
+            language,
+          )
+        : null,
       source,
     ),
     sourceEpisodeRuntimes: movie
@@ -462,9 +493,7 @@ export function normalizeMovieSearch(
         title: result.title,
         originalTitle: field(clean(result.original_title), source),
         overview: field(clean(result.overview), source),
-        primaryReleaseDate: result.release_date
-          ? known({ precision: "DAY", date: result.release_date }, source)
-          : missing(),
+        primaryReleaseDate: releaseDateField(result.release_date, source),
         originalLanguageCode: field(language(result.original_language), source),
         media: media.state === "known" ? media.value : [],
         provenance: source,
@@ -495,9 +524,7 @@ export function normalizeSeriesSearch(
         title: result.name,
         originalTitle: field(clean(result.original_name), source),
         overview: field(clean(result.overview), source),
-        primaryReleaseDate: result.first_air_date
-          ? known({ precision: "DAY", date: result.first_air_date }, source)
-          : missing(),
+        primaryReleaseDate: releaseDateField(result.first_air_date, source),
         originalLanguageCode: field(language(result.original_language), source),
         media: media.state === "known" ? media.value : [],
         provenance: source,

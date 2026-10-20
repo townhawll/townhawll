@@ -2,18 +2,16 @@ import type { Provenance } from "../../contracts.js";
 import type { ProviderIdentity } from "../../identity.js";
 
 export { known, missing, field } from "../../candidate-fields.js";
+export {
+  cleanText as clean,
+  compactToken as key,
+} from "../../normalization/text.js";
 type IgdbIdentity = Extract<ProviderIdentity, { provider: "IGDB" }>;
 export function identity(
   entity: IgdbIdentity["entity"],
   id: number,
 ): IgdbIdentity {
   return { provider: "IGDB", entity, id: String(id) };
-}
-export function clean(value: string | null | undefined): string | null {
-  return value?.trim() || null;
-}
-export function key(value: string): string {
-  return value.toLowerCase().replace(/[\s_-]+/g, "");
 }
 export function timestamp(value: number | null | undefined): string | null {
   if (value === null || value === undefined) return null;

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { NormalizationPolicy } from "../../normalization/ratings.js";
 
 import { loadTmdbEnvironment } from "../../config.js";
 import {
@@ -9,6 +10,7 @@ import {
 } from "../../http/index.js";
 
 export type TmdbClientOptions = {
+  normalization?: NormalizationPolicy;
   accessToken?: string;
   http?: Omit<ProviderHttpOptions, "provider" | "baseUrl">;
 };
