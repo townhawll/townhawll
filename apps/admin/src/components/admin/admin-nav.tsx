@@ -10,9 +10,11 @@ import { getVisibleAdminNavigation } from "@/lib/admin-navigation";
 export function AdminNav({
   permissions,
   onNavigate,
+  collapsed = false,
 }: Readonly<{
   permissions: readonly Permission[];
   onNavigate?: () => void;
+  collapsed?: boolean;
 }>) {
   const pathname = usePathname();
   const items = getVisibleAdminNavigation(new Set(permissions));
@@ -30,16 +32,20 @@ export function AdminNav({
             className={cn(
               "flex min-h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-foreground-secondary transition-colors duration-fast hover:bg-surface-hover hover:text-foreground",
               active && "bg-accent-muted text-foreground",
+              collapsed && "justify-center px-0",
             )}
             href={item.href}
             key={item.href}
+            title={collapsed ? item.label : undefined}
             {...(onNavigate ? { onClick: onNavigate } : {})}
           >
             <Icon
               aria-hidden="true"
-              className={cn("size-4", active && "text-accent")}
+              className={cn("size-4 shrink-0", active && "text-accent")}
             />
-            {item.label}
+            <span className={collapsed ? "sr-only" : undefined}>
+              {item.label}
+            </span>
           </Link>
         );
       })}

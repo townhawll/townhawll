@@ -53,6 +53,48 @@ const appEnvironmentSchema = z.object({
     ),
 });
 
+const tmdbEnvironmentSchema = z.object({
+  TMDB_ACCESS_TOKEN: z.string().trim().min(1, "TMDB_ACCESS_TOKEN is required."),
+});
+
+const igdbEnvironmentSchema = z.object({
+  IGDB_CLIENT_ID: z.string().trim().min(1, "IGDB_CLIENT_ID is required."),
+  IGDB_CLIENT_SECRET: z
+    .string()
+    .trim()
+    .min(1, "IGDB_CLIENT_SECRET is required."),
+});
+
+const steamEnvironmentSchema = z.object({
+  STEAM_API_KEY: z.string().trim().min(1, "STEAM_API_KEY is required."),
+});
+
+// Lazy and independent: disabled providers must not prevent unrelated apps starting.
+export function loadTmdbEnvironment(
+  environment: NodeJS.ProcessEnv = process.env,
+) {
+  const result = tmdbEnvironmentSchema.safeParse(environment);
+  if (!result.success) throw invalidEnvironment(result.error);
+  return result.data;
+}
+
+export function loadIgdbEnvironment(
+  environment: NodeJS.ProcessEnv = process.env,
+) {
+  const result = igdbEnvironmentSchema.safeParse(environment);
+  if (!result.success) throw invalidEnvironment(result.error);
+  return result.data;
+}
+
+// Only required for authenticated Steam Web API calls, not public Store metadata.
+export function loadSteamEnvironment(
+  environment: NodeJS.ProcessEnv = process.env,
+) {
+  const result = steamEnvironmentSchema.safeParse(environment);
+  if (!result.success) throw invalidEnvironment(result.error);
+  return result.data;
+}
+
 const emailEnvironmentSchema = appEnvironmentSchema.extend({
   EMAIL_FROM: z.string().trim().min(1, "EMAIL_FROM is required."),
   RESEND_API_KEY: z.string().trim().min(1, "RESEND_API_KEY is required."),

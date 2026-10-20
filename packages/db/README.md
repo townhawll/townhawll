@@ -12,13 +12,6 @@ generated client remains in `generated/prisma/`.
 
 ## Catalogue schema
 
-The catalogue schema follows the current
-[Catalogue Schema](https://www.notion.so/3f170306b84280138eb8ecf292dade9f) and
-its
-[implementation audit](https://www.notion.so/3f370306b84281ebb040cb1ec37b7830).
-The parent specification wins over the draft and older architecture notes: the
-persisted title types are `GAME`, `MOVIE`, and `SERIES`.
-
 | File                        | Domain                                                                                                                                               |
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `catalogue.prisma`          | Canonical titles, provider mappings/snapshots, aliases, movie/series/game metadata, seasons, game requirements/completion times, title relationships |
@@ -75,7 +68,7 @@ Prisma does not fully represent CHECKs, triggers, expression indexes or NULL
 uniqueness semantics. Inspect generated migrations; a schema diff alone cannot
 prove these rules survive. Database integration tests exercise them directly.
 
-### Query and ingestion rules
+### Query and ingestion rules for later steps
 
 - Public catalogue queries require `publicationStatus: "PUBLISHED"` **and**
   `deletedAt: null`. Soft deletion retains mappings, media and curated awards;
@@ -85,8 +78,8 @@ prove these rules survive. Database integration tests exercise them directly.
   a current media pointer precedes explicit old-version cleanup; variants
   cascade with their version. Reusable taxonomy entities referenced by titles
   are restricted.
-- Provider mapping uniqueness is `provider + providerId`. Namespace identifiers
-  when a provider has overlapping title ID spaces (for example,
+- Provider mapping uniqueness is `provider + providerId`. In Step 9, namespace
+  identifiers when a provider has overlapping title ID spaces (for example,
   `provider: "tmdb", providerId: "movie:123"` versus `"series:123"`). Keep raw
   provider identifiers available in snapshots/source references. Provider IDs,
   slugs and snapshots never replace the internal title ID.

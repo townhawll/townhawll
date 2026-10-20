@@ -1,0 +1,37 @@
+{
+  "name": "@townhawll/integrations",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./contracts": "./src/contracts.ts",
+    "./identity": "./src/identity.ts",
+    "./http": {
+      "browser": null,
+      "default": "./src/http/index.ts"
+    },
+    "./config": {
+      "browser": null,
+      "default": "./src/config.ts"
+    }
+  },
+  "dependencies": {
+    "@townhawll/config": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@townhawll/eslint-config": "workspace:*",
+    "@townhawll/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
