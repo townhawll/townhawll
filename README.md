@@ -88,3 +88,14 @@ fails validation rather than silently using a different driver.
     pnpm build
 
 Use pnpm format to format supported repository files.
+
+`pnpm install` also initializes Husky Git hooks. Before each commit, lint-staged
+runs ESLint with fixes on staged JavaScript/TypeScript files from each
+workspace, then Prettier on supported staged files using the existing
+configurations. Unstaged changes in partially staged files are hidden during
+checks and restored afterward; only the staged changes and successful fixes are
+staged for the commit. Failures block the commit and restore the original state.
+
+Run `pnpm lint:staged` to check the current staged changes manually. Hooks do
+not run typechecks, tests, builds, or migrations; CI remains responsible for the
+full checks. CI disables hook installation with `HUSKY=0`.
