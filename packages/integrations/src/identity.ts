@@ -44,6 +44,16 @@ export const providerIdentitySchema = z.discriminatedUnion("provider", [
 export type ProviderIdentity = z.infer<typeof providerIdentitySchema>;
 export type CatalogueProvider = ProviderIdentity["provider"];
 
+export const steamAppIdentitySchema = providerIdentitySchema.refine(
+  (identity) =>
+    identity.provider === "STEAM" &&
+    identity.entity === "app" &&
+    /^[1-9]\d{0,9}$/.test(identity.id) &&
+    BigInt(identity.id) <= 4_294_967_295n,
+  "Expected a Steam app identity with a positive unsigned 32-bit App ID.",
+);
+export type SteamAppIdentity = z.infer<typeof steamAppIdentitySchema>;
+
 /** Exact identity only; never compare provider records using names or fuzzy matches. */
 export function providerIdentityKey(identity: ProviderIdentity): string {
   const value = providerIdentitySchema.parse(identity);

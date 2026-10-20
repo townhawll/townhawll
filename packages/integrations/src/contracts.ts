@@ -77,6 +77,10 @@ export const certificationSchema = z.strictObject({
   system: text.nullable(),
   country: country.nullable(),
   provenance: provenanceSchema,
+  releaseType: count.nullable().optional(),
+  sourceReleaseDate: z.string().nullable().optional(),
+  note: z.string().nullable().optional(),
+  languageCode: language.nullable().optional(),
 });
 
 const mediaOwnerSchema = z
@@ -113,7 +117,8 @@ const mediaOwnerSchema = z
 export const mediaCandidateSchema = z
   .strictObject({
     owner: mediaOwnerSchema,
-    purpose: z.enum(["POSTER", "HERO_ART", "PERSON_IMAGE", "LOGO"]),
+    // Null means selection has not assigned a persistent media purpose yet.
+    purpose: z.enum(["POSTER", "HERO_ART", "PERSON_IMAGE", "LOGO"]).nullable(),
     sourceType: z.enum([
       "POSTER",
       "BACKDROP",
@@ -121,13 +126,18 @@ export const mediaCandidateSchema = z
       "COVER",
       "PROFILE",
       "LOGO",
+      "SCREENSHOT",
     ]),
     providerAssetId: text.nullable(),
+    providerRecordId: text.nullable().optional(),
     sourceUrl: sourceUrlSchema,
     width: z.number().int().positive().nullable(),
     height: z.number().int().positive().nullable(),
     languageCode: language.nullable(),
     provenance: provenanceSchema,
+    providerPrimary: z.boolean().optional(),
+    providerVoteAverage: z.number().finite().nullable().optional(),
+    providerVoteCount: count.nullable().optional(),
   })
   .superRefine((value, ctx) => {
     const allowed =
@@ -136,7 +146,11 @@ export const mediaCandidateSchema = z
         : value.owner.kind === "SEASON"
           ? ["POSTER"]
           : ["POSTER", "HERO_ART", "LOGO"];
-    if (!allowed.includes(value.purpose))
+    if (
+      value.purpose === null
+        ? value.owner.kind !== "TITLE"
+        : !allowed.includes(value.purpose)
+    )
       ctx.addIssue({
         code: "custom",
         message: "Media purpose is not supported for this owner.",
@@ -154,6 +168,11 @@ export const videoCandidateSchema = z.strictObject({
   official: candidateFieldSchema(z.boolean()),
   languageCode: candidateFieldSchema(language),
   provenance: provenanceSchema,
+  sourceType: text.nullable().optional(),
+  providerLanguageCode: language.nullable().optional(),
+  regionCode: country.nullable().optional(),
+  publishedAt: z.iso.datetime({ offset: true }).nullable().optional(),
+  resolution: z.number().int().positive().nullable().optional(),
 });
 
 export const aliasCandidateSchema = z.strictObject({
@@ -161,6 +180,8 @@ export const aliasCandidateSchema = z.strictObject({
   normalizedKey: text,
   languageCode: language.nullable(),
   provenance: provenanceSchema,
+  countryCode: country.nullable().optional(),
+  sourceType: z.string().nullable().optional(),
 });
 
 const movieSchema = z.strictObject({
@@ -298,3 +319,15 @@ export type Provenance = z.infer<typeof provenanceSchema>;
 export type MediaCandidate = z.infer<typeof mediaCandidateSchema>;
 export type VideoCandidate = z.infer<typeof videoCandidateSchema>;
 export type TitleCandidate = z.infer<typeof titleCandidateSchema>;
+export type CandidateField<T> =
+  | {
+      state: "known";
+      value: T;
+      certainty: "PROVIDED" | "INFERRED";
+      evidence: string[];
+      provenance: Provenance;
+    }
+  | {
+      state: "missing";
+      reason: "NOT_PROVIDED" | "NOT_REQUESTED" | "UNAVAILABLE" | "UNSUPPORTED";
+    };

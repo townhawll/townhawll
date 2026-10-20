@@ -252,7 +252,14 @@ describe("normalized candidate contracts", () => {
       mediaCandidateSchema.safeParse({ ...media, purpose: "AVATAR" }).success,
     ).toBe(false);
     expect(
-      mediaCandidateSchema.safeParse({ ...media, sourceType: "SCREENSHOT" })
+      mediaCandidateSchema.safeParse({
+        ...media,
+        sourceType: "SCREENSHOT",
+        purpose: null,
+      }).success,
+    ).toBe(true);
+    expect(
+      mediaCandidateSchema.safeParse({ ...media, sourceType: "UNKNOWN_SOURCE" })
         .success,
     ).toBe(false);
     expect(

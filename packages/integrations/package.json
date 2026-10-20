@@ -13,6 +13,21 @@
     ".": "./src/index.ts",
     "./contracts": "./src/contracts.ts",
     "./identity": "./src/identity.ts",
+    "./catalogue-candidates": "./src/catalogue-candidates.ts",
+    "./game-candidates": "./src/game-candidates.ts",
+    "./game-supplements": "./src/game-supplements.ts",
+    "./steam": {
+      "browser": null,
+      "default": "./src/providers/steam/index.ts"
+    },
+    "./igdb": {
+      "browser": null,
+      "default": "./src/providers/igdb/index.ts"
+    },
+    "./tmdb": {
+      "browser": null,
+      "default": "./src/providers/tmdb/index.ts"
+    },
     "./http": {
       "browser": null,
       "default": "./src/http/index.ts"
@@ -24,6 +39,8 @@
   },
   "dependencies": {
     "@townhawll/config": "workspace:*",
+    "@townhawll/observability": "workspace:*",
+    "htmlparser2": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
