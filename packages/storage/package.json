@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "browser": null,
+      "default": "./src/index.ts"
+    },
     "./validation": "./src/validation.ts"
   },
   "dependencies": {

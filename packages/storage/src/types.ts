@@ -17,7 +17,9 @@ export interface ReadObjectResult {
 }
 
 export interface ObjectStorage {
+  // This adapter serves intentionally PUBLIC objects. Prefixes do not provide privacy.
   readonly driver: "local" | "r2";
+  // Create only: reject an existing key instead of overwriting its bytes.
   uploadObject(input: UploadObjectInput): Promise<StoredObject>;
   deleteObject(key: string): Promise<void>;
   getPublicUrl(key: string): string;

@@ -6,6 +6,7 @@ import {
   type OnboardingProfileInput,
   type ProfileDetailsInput,
 } from "./index.ts";
+import { resolveProfileAvatarUrl } from "./avatar.ts";
 
 function isUniqueConstraintError(error: unknown): boolean {
   return (
@@ -18,7 +19,7 @@ function isUniqueConstraintError(error: unknown): boolean {
 
 export async function getOnboardingProfile(userId: string) {
   const { db } = await import("@townhawll/db");
-  return db.user.findUnique({
+  const record = await db.user.findUnique({
     where: { id: userId },
     select: {
       name: true,
@@ -27,6 +28,7 @@ export async function getOnboardingProfile(userId: string) {
           username: true,
           displayName: true,
           avatarUrl: true,
+          avatarObjectKey: true,
           bio: true,
           contentFocus: true,
           onboardingProfileSavedAt: true,
@@ -35,6 +37,15 @@ export async function getOnboardingProfile(userId: string) {
       },
     },
   });
+  if (!record?.profile) return record;
+  const { avatarObjectKey: _key, ...profile } = record.profile;
+  return {
+    ...record,
+    profile: {
+      ...profile,
+      avatarUrl: await resolveProfileAvatarUrl(record.profile),
+    },
+  };
 }
 
 export async function getOnboardingCompletedAt(userId: string) {
@@ -63,6 +74,7 @@ export async function getEditableProfile(
       username: true,
       displayName: true,
       avatarUrl: true,
+      avatarObjectKey: true,
       bio: true,
     },
   });
@@ -71,7 +83,7 @@ export async function getEditableProfile(
   return {
     username: profile.username,
     displayName: profile.displayName,
-    avatarUrl: profile.avatarUrl,
+    avatarUrl: await resolveProfileAvatarUrl(profile),
     bio: profile.bio,
   };
 }

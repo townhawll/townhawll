@@ -1,4 +1,5 @@
 import { usernameSchema } from "./index.ts";
+import { resolveProfileAvatarUrl } from "./avatar.ts";
 
 export interface PublicProfile {
   userId: string;
@@ -14,6 +15,7 @@ interface PublicProfileRecord {
   username: string | null;
   displayName: string | null;
   avatarUrl: string | null;
+  avatarObjectKey: string | null;
   bio: string | null;
   user: { createdAt: Date };
 }
@@ -38,6 +40,7 @@ async function createPublicProfileRepository(): Promise<PublicProfileRepository>
           username: true,
           displayName: true,
           avatarUrl: true,
+          avatarObjectKey: true,
           bio: true,
           user: { select: { createdAt: true } },
         },
@@ -62,7 +65,7 @@ export async function getPublicProfileByUsername(
     userId: record.userId,
     username: record.username,
     displayName: record.displayName,
-    avatarUrl: record.avatarUrl,
+    avatarUrl: await resolveProfileAvatarUrl(record),
     bio: record.bio,
     joinedAt: record.user.createdAt,
   };

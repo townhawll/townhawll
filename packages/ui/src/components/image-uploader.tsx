@@ -120,9 +120,12 @@ export function ImageUploader({
     setMessage("Removing avatar…");
     try {
       const response = await fetch(endpoint, { method: "DELETE" });
-      const result = (await response.json()) as { error?: string };
+      const result = (await response.json()) as {
+        error?: string;
+        avatarUrl?: string | null;
+      };
       if (!response.ok) throw new Error(result.error);
-      setImageUrl(null);
+      setImageUrl(result.avatarUrl ?? null);
       setStatus("success");
       setMessage("Avatar removed.");
     } catch (error) {

@@ -7,6 +7,7 @@
     "build": "next build",
     "dev": "next dev --port 3000",
     "lint": "eslint .",
+    "test": "vitest run",
     "start": "next start --port 3000",
     "typecheck": "next typegen && tsc --noEmit"
   },
@@ -33,6 +34,7 @@
     "@types/react-dom": "catalog:",
     "eslint": "catalog:",
     "postcss": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

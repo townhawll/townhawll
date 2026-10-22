@@ -4,6 +4,44 @@ import { StorageValidationError } from "./errors.ts";
 
 const SAFE_KEY = /^[a-zA-Z0-9][a-zA-Z0-9/_-]*\.[a-z0-9]+$/;
 const SAFE_PREFIX = /^[a-zA-Z0-9][a-zA-Z0-9/_-]*$/;
+const PUBLIC_MEDIA_CATEGORIES = [
+  "titles",
+  "seasons",
+  "people",
+  "users",
+  "collections",
+] as const;
+export type PublicMediaCategory = (typeof PUBLIC_MEDIA_CATEGORIES)[number];
+
+export function createMediaObjectKey(input: {
+  category: PublicMediaCategory;
+  extension: "webp" | "png" | "jpg";
+}): string {
+  if (!PUBLIC_MEDIA_CATEGORIES.includes(input.category))
+    throw new StorageValidationError(
+      "The media category is invalid.",
+      "INVALID_KEY",
+    );
+  return createObjectKey({
+    prefix: input.category,
+    extension: input.extension,
+  });
+}
+
+export function isPublicMediaObjectKey(key: string): boolean {
+  try {
+    assertSafeObjectKey(key);
+    return PUBLIC_MEDIA_CATEGORIES.some((category) =>
+      key.startsWith(`${category}/`),
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function buildPublicObjectUrl(baseUrl: string, key: string): string {
+  return `${baseUrl.replace(/\/+$/, "")}/${encodeObjectKey(key)}`;
+}
 
 function trimForwardSlashes(value: string): string {
   let start = 0;

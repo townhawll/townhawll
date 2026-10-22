@@ -1,4 +1,12 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+
+vi.mock("@townhawll/storage", async (original) => ({
+  ...(await original<typeof import("@townhawll/storage")>()),
+  getStorage: () =>
+    Promise.resolve({
+      getPublicUrl: (key: string) => `https://media.example.com/${key}`,
+    }),
+}));
 
 import {
   getPublicProfilePath,
@@ -13,6 +21,7 @@ const record = {
   username: "town_user",
   displayName: "Town User",
   avatarUrl: "https://images.example.com/avatar.png",
+  avatarObjectKey: null,
   bio: "Games and films.",
   user: { createdAt: new Date("2026-09-01T00:00:00.000Z") },
 };
@@ -80,4 +89,19 @@ test("canonical usernames and profile ownership use exact stored identity", () =
 
 test("public profile paths use the canonical username", () => {
   expect(getPublicProfilePath("player_one")).toBe("/u/player_one");
+});
+
+test("managed public profile avatars resolve from their key without exposing storage fields", async () => {
+  const key = "users/12345678-1234-4234-8234-123456789012.webp";
+  const repository: PublicProfileRepository = {
+    findByUsername: () =>
+      Promise.resolve({
+        ...record,
+        avatarObjectKey: key,
+        avatarUrl: "https://old.example/obsolete.png",
+      }),
+  };
+  const result = await getPublicProfileByUsername("town_user", repository);
+  expect(result?.avatarUrl).toBe(`https://media.example.com/${key}`);
+  expect(result).not.toHaveProperty("avatarObjectKey");
 });

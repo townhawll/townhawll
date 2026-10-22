@@ -125,10 +125,16 @@ const storageEnvironmentSchema = runtimeEnvironmentSchema.extend({
     z
       .string()
       .url()
-      .refine(
-        (value) => value.startsWith("https://") || value.startsWith("http://"),
-        "R2_PUBLIC_URL must use the http:// or https:// protocol.",
-      )
+      .refine((value) => {
+        const url = new URL(value);
+        return (
+          ["https:", "http:"].includes(url.protocol) &&
+          !url.username &&
+          !url.password &&
+          !url.search &&
+          !url.hash
+        );
+      }, "R2_PUBLIC_URL must be an HTTP(S) base URL without credentials, query parameters or a fragment.")
       .optional(),
   ),
 });
@@ -273,6 +279,14 @@ export function loadStorageEnvironment(
       "Invalid server environment: the r2 storage driver requires all R2 variables.",
     );
   }
+
+  if (
+    values.NODE_ENV === "production" &&
+    !values.R2_PUBLIC_URL!.startsWith("https://")
+  )
+    throw new Error(
+      "Invalid server environment: production R2_PUBLIC_URL must use HTTPS.",
+    );
 
   return {
     driver,

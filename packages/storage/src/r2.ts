@@ -5,7 +5,7 @@ import {
 } from "@aws-sdk/client-s3";
 
 import { StorageError } from "./errors.ts";
-import { assertSafeObjectKey, encodeObjectKey } from "./keys.ts";
+import { assertSafeObjectKey, buildPublicObjectUrl } from "./keys.ts";
 import type { ObjectStorage } from "./types.ts";
 
 export function createR2Storage(config: {
@@ -23,8 +23,8 @@ export function createR2Storage(config: {
       secretAccessKey: config.secretAccessKey,
     },
   });
-  const publicUrl = config.publicUrl.replace(/\/$/, "");
-  const getPublicUrl = (key: string) => `${publicUrl}/${encodeObjectKey(key)}`;
+  const getPublicUrl = (key: string) =>
+    buildPublicObjectUrl(config.publicUrl, key);
 
   return {
     driver: "r2",
@@ -39,6 +39,7 @@ export function createR2Storage(config: {
             Body: input.body,
             ContentType: input.contentType,
             CacheControl: input.cacheControl,
+            IfNoneMatch: "*",
           }),
         );
       } catch (error) {

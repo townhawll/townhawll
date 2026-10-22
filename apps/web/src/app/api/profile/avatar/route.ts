@@ -4,8 +4,10 @@ import { takeRateLimit } from "@townhawll/cache";
 import {
   removeProfileAvatar,
   replaceProfileAvatar,
+  AvatarConflictError,
 } from "@townhawll/profile/avatar";
 import { StorageValidationError } from "@townhawll/storage";
+import { AVATAR_MAX_BYTES } from "@townhawll/storage/validation";
 import {
   createLogger,
   getOrCreateRequestId,
@@ -16,9 +18,14 @@ import type { NextRequest } from "next/server";
 
 import { auth } from "@/auth";
 import { getClientIp } from "@/lib/client-ip";
+import {
+  AVATAR_MAX_REQUEST_BYTES,
+  isSameOriginAvatarRequest,
+  readAvatarFormData,
+} from "@/lib/avatar-request";
 
 const logger = createLogger("web");
-const MAX_REQUEST_BYTES = 5 * 1024 * 1024 + 64 * 1024;
+export const runtime = "nodejs";
 
 async function getUser() {
   try {
@@ -62,9 +69,11 @@ export async function POST(request: NextRequest) {
   const user = await getUser();
   if (!user)
     return errorResponse("Sign in to upload an avatar.", 401, requestId);
+  if (!isSameOriginAvatarRequest(request))
+    return errorResponse("This request is not allowed.", 403, requestId);
 
   const contentLength = Number(request.headers.get("content-length") ?? 0);
-  if (contentLength > MAX_REQUEST_BYTES) {
+  if (contentLength > AVATAR_MAX_REQUEST_BYTES) {
     return errorResponse("Choose an image smaller than 5 MB.", 413, requestId);
   }
 
@@ -76,11 +85,17 @@ export async function POST(request: NextRequest) {
         requestId,
       );
     }
-    const formData = await request.formData();
+    const formData = await readAvatarFormData(request);
     const image = formData.get("image");
     if (!(image instanceof File)) {
       return errorResponse("Choose an image to upload.", 400, requestId);
     }
+    if (!image.size || image.size > AVATAR_MAX_BYTES)
+      return errorResponse(
+        "Choose an image smaller than 5 MB.",
+        400,
+        requestId,
+      );
     const result = await replaceProfileAvatar(user.id, {
       bytes: new Uint8Array(await image.arrayBuffer()),
       claimedContentType: image.type,
@@ -98,6 +113,8 @@ export async function POST(request: NextRequest) {
       { headers: { "cache-control": "no-store", "x-request-id": requestId } },
     );
   } catch (error) {
+    if (error instanceof AvatarConflictError)
+      return errorResponse(error.message, 409, requestId);
     if (error instanceof StorageValidationError) {
       return errorResponse(error.message, 400, requestId);
     }
@@ -121,6 +138,8 @@ export async function DELETE(request: NextRequest) {
   const user = await getUser();
   if (!user)
     return errorResponse("Sign in to remove an avatar.", 401, requestId);
+  if (!isSameOriginAvatarRequest(request))
+    return errorResponse("This request is not allowed.", 403, requestId);
 
   try {
     if (!(await allowAvatarChange(request, user.id))) {
@@ -140,10 +159,12 @@ export async function DELETE(request: NextRequest) {
     revalidatePath("/u/[username]", "page");
     revalidatePath("/settings/profile");
     return Response.json(
-      { removed: result.removed },
+      { removed: result.removed, avatarUrl: result.avatarUrl },
       { headers: { "cache-control": "no-store", "x-request-id": requestId } },
     );
   } catch (error) {
+    if (error instanceof AvatarConflictError)
+      return errorResponse(error.message, 409, requestId);
     requestLogger.error({
       err: error,
       event: "avatar_remove_failure",

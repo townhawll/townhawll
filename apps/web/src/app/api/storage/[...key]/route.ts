@@ -1,5 +1,9 @@
 import { loadStorageEnvironment } from "@townhawll/config/server-env";
-import { getStorage, StorageError } from "@townhawll/storage";
+import {
+  getStorage,
+  isPublicMediaObjectKey,
+  StorageError,
+} from "@townhawll/storage";
 
 export async function GET(
   _request: Request,
@@ -12,7 +16,10 @@ export async function GET(
 
   try {
     const storage = await getStorage();
-    const object = await storage.readObject?.((await params).key.join("/"));
+    const key = (await params).key.join("/");
+    if (!isPublicMediaObjectKey(key))
+      return new Response(null, { status: 404 });
+    const object = await storage.readObject?.(key);
     if (!object) return new Response(null, { status: 404 });
     return new Response(new Blob([Uint8Array.from(object.body)]), {
       headers: {

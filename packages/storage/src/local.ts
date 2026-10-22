@@ -2,7 +2,7 @@ import { access, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { StorageError } from "./errors.ts";
-import { assertSafeObjectKey, encodeObjectKey } from "./keys.ts";
+import { assertSafeObjectKey, buildPublicObjectUrl } from "./keys.ts";
 import type {
   ObjectStorage,
   ReadObjectResult,
@@ -62,8 +62,8 @@ export async function createLocalStorage(options?: {
     /* turbopackIgnore: true */
     options?.rootDirectory ?? path.join(workspaceRoot, ".tmp", "storage"),
   );
-  const publicPath = (options?.publicPath ?? "/api/storage").replace(/\/$/, "");
-  const getPublicUrl = (key: string) => `${publicPath}/${encodeObjectKey(key)}`;
+  const getPublicUrl = (key: string) =>
+    buildPublicObjectUrl(options?.publicPath ?? "/api/storage", key);
 
   return {
     driver: "local",
@@ -76,14 +76,14 @@ export async function createLocalStorage(options?: {
         contentType: input.contentType,
         ...(input.cacheControl ? { cacheControl: input.cacheControl } : {}),
       };
+      let created = false;
       try {
         await writeFile(filePath, input.body, { flag: "wx" });
+        created = true;
         await writeFile(metadataPath, JSON.stringify(metadata), { flag: "wx" });
       } catch (error) {
-        await Promise.allSettled([
-          ignoreMissingDelete(filePath),
-          ignoreMissingDelete(metadataPath),
-        ]);
+        // An exclusive-create collision must never remove the existing object.
+        if (created) await ignoreMissingDelete(filePath).catch(() => {});
         throw new StorageError(
           "The local object could not be written.",
           "OPERATION_FAILED",
