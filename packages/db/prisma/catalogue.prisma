@@ -113,7 +113,7 @@ model Title {
   movie             MovieMetadata?
   series            SeriesMetadata?
   game              GameMetadata?
-  seasons           Season[]                @relation("SeriesSeasons")
+  seasons           Season[]                   @relation("SeriesSeasons")
   providerMappings  TitleProviderMapping[]
   aliases           TitleAlias[]
   media             MediaAsset[]
@@ -128,8 +128,9 @@ model Title {
   requirements      GameSystemRequirement[]
   completionTime    GameCompletionTime?
   awardEntries      IndustryAwardEntry[]
-  outgoingRelations TitleRelation[]         @relation("RelationSource")
-  incomingRelations TitleRelation[]         @relation("RelationTarget")
+  outgoingRelations TitleRelation[]            @relation("RelationSource")
+  incomingRelations TitleRelation[]            @relation("RelationTarget")
+  importOperations  CatalogueImportOperation[]
 
   @@index([publicationStatus, type, primaryReleaseDate(sort: Desc), id])
   @@index([type, isAnime])

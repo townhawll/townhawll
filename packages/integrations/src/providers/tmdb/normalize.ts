@@ -184,7 +184,7 @@ function normalizeSeasons(
       identity,
       seriesIdentity: context.provenance.identity,
       seasonNumber: season.season_number,
-      name: season.name ? normalizeName(season.name) : null,
+      name: clean(normalizeName(season.name ?? "")),
       airDate: field(exactCalendarDate(season.air_date), source),
       episodeCount: field(season.episode_count, source),
       media: normalizeImages(

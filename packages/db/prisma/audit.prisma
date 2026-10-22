@@ -1,0 +1,27 @@
+enum AdminAuditResult {
+  SUCCESS
+  FAILURE
+  DENIED
+}
+
+// Database triggers prohibit UPDATE, DELETE and TRUNCATE, including for OWNER.
+model AdminAuditEvent {
+  id         String           @id @default(cuid())
+  actorId    String           @map("actor_id")
+  actorRoles StaffRole[]      @map("actor_roles")
+  action     String           @db.VarChar(100)
+  targetType String           @map("target_type") @db.VarChar(100)
+  targetId   String?          @map("target_id") @db.VarChar(128)
+  result     AdminAuditResult
+  reason     String?          @db.VarChar(500)
+  changes    Json
+  requestId  String           @map("request_id") @db.VarChar(128)
+  createdAt  DateTime         @default(now()) @map("created_at")
+  actor      User             @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([actorId, createdAt])
+  @@index([targetType, targetId, createdAt])
+  @@index([action, createdAt])
+  @@index([requestId])
+  @@map("admin_audit_events")
+}

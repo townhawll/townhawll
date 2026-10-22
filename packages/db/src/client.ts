@@ -44,5 +44,8 @@ export {
   MediaProcessingStatus,
   MediaVariantType,
   VideoType,
+  CatalogueImportType,
+  CatalogueImportStatus,
+  AdminAuditResult,
 } from "../generated/prisma/client.ts";
 export type { Prisma } from "../generated/prisma/client.ts";

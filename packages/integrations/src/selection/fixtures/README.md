@@ -1,71 +1,47 @@
-# Representative selection fixtures
+# Media and video selection fixtures
 
-`representative-media.json` contains small public provider excerpts from the
-read-only research playground's current scene-first game reports and recorded
-video checks. It is independent of that repository at test runtime. No
-production credentials, persistence fixtures or downloaded image bytes are
-included.
+`representative-media.json` contains recorded public provider metadata used by
+`../representative-fixtures.ts` and `../representative.test.ts` to test media
+and video selection. It is test data, not production catalogue content or a list
+of approved assets. Tests run without live provider requests or another
+repository.
 
-These are source inputs, including deliberately unsuitable media, not approved
-content-page assets. `recordedBackdropUrl` names a historical provider
-reference, not a selected hero. Bad inputs are retained to test that they do not
-become recommendations.
+The suite covers 18 titles: 12 recorded games, four recorded movie/series
+samples, and two synthetic adapter fixtures. Cases include strong scene-based
+heroes, unsuitable promotional artwork, misleading video labels and missing
+media.
 
-The replay uses **18 titles**: 12 recorded games, four recorded movie/series
-video samples, plus the existing synthetic King Kong and Cowboy Bebop adapter
-fixtures. The recorded excerpts include 53 game image references and 12 video
-references. This is a bounded regression sample, not a catalogue audit or
-accuracy benchmark.
+## What the data means
 
-Games include Red Dead Redemption 2, GTA V, The Witcher 3, Portal 2, Portal,
-Skyrim, Final Fantasy VII, Tunic, Hyper Light Drifter, Resident Evil 4, Ghost of
-Yotei and Clair Obscur. Screen samples include Runner, Ramayana, Reacher and 3
-Body Problem.
+- Image URLs identify source candidates. `recordedBackdropUrl` is a historical
+  reference, not a selected hero. Deliberately unsuitable inputs remain in the
+  fixtures to test rejection and manual-review behavior.
+- Dimensions and visual signals describe recorded observations. Missing values
+  remain unknown; tests do not invent dimensions or perform image analysis.
+- `visualReview` and `backdropReview` contain explicit human assessments. These
+  are separate from automated signals, which can miss logos, embedded text or
+  promotional composition.
+- Video metadata preserves provider claims separately from inspected evidence.
+  An official teaser label alone does not establish suitability or a trusted
+  uploader.
 
-- RDR2 recommends the recorded snowy riding scene; Resident Evil 4 recommends
-  the village scene. Saved playground layouts were inspected to check contrast
-  and overlay readability. The Witcher layout was also inspected as a visual
-  reference.
-- Eleven of the twelve game suggestions match the saved scene-first choice,
-  including missing-hero results. This is agreement with that frozen subset, not
-  proof of visual correctness. Stored image dimensions describe those inspected
-  URLs, which can differ from provider-original dimensions.
-- GTA V favors `sc10f94` over the saved `sc10f95`. Both images were opened and
-  visually compared: the former has a strong action scene; the latter has more
-  useful left-side space for an overlay. Both remain selectable. Color/edge
-  heuristics cannot settle this editorial composition choice objectively.
-- Portal has no recommendable hero. Final Fantasy VII's text-dominated artwork
-  remains eligible for manual inspection, with no automatic hero suggestion.
-- Recorded poster dimensions and some screen media are absent. They stay
-  unknown; the replay does not invent geometry or stretch small images.
-- Reacher's recorded backdrop was opened for visual review: it is a posed
-  promotional portrait on a red/blue studio background. Its separate
-  `backdropReview` records the observed 3840 × 2160 dimensions and an explicit
-  `PROMOTIONAL_PORTRAIT` assessment. It remains eligible for deliberate manual
-  choice, but receives no automatic hero recommendation despite sufficient size.
-- Runner's “What if RUNNER was a K-drama?” clip is a negative video example. Its
-  independently inspected title has no supported promo format, so the selector
-  rejects it rather than trusting the provider's official teaser label.
-- Three additional artwork references were visually reviewed: Resident Evil 4's
-  `ar1xhu` is a close-up character montage, Ghost of Yotei's `ar4u71` combines a
-  posed character with a large title logo, and GTA V's `ar3m56` is a logo card.
-  Separate `visualReview` assessments make these manual-only, including when
-  evaluated without better alternatives. Original pixel heuristics are retained:
-  their low text scores do not establish that logos or promotional composition
-  are absent. These assessments are test evidence, not a production URL
-  blacklist or an automatic image-analysis service.
-- The recorded video reports do not preserve stable channel IDs. Their earlier
-  display-name trust claims are deliberately not promoted to verified uploader
-  evidence, so this replay supplies no automatic primary videos. Separate
-  focused tests exercise successful primary selection, trusted IDs, language
-  preference and trailer/teaser/gameplay fallbacks using explicit synthetic
-  evidence.
+## Important regression cases
 
-Pixel signals were recorded by the playground's lightweight heuristics; no new
-pixel analysis or live provider catalogue fetch was performed for this replay.
-The two GTA V image references were opened for their near-tie comparison; the
-Reacher reference and the three flagged game artwork references were
-subsequently opened for separate visual assessments. Provider metadata and
-playback availability can change. The test preserves original claims and
-identifies unknowns rather than treating old reports as current provider truth
-or editorial approval.
+- Red Dead Redemption 2 and Resident Evil 4 recommend scene-based heroes.
+- Portal has no recommended hero. Text-heavy or promotional artwork can remain
+  eligible for manual selection without receiving an automatic recommendation.
+- Reacher's posed promotional backdrop and artwork IDs `ar1xhu`, `ar4u71` and
+  `ar3m56` require manual selection, even without better alternatives.
+- Runner's “What if RUNNER was a K-drama?” clip is rejected as non-promotional.
+- Recorded videos lack stable channel IDs, so these samples produce no automatic
+  primary video. Separate focused tests cover successful primary selection,
+  trusted uploaders, language preferences and category fallbacks.
+
+Valid alternatives must remain selectable, rejected candidates must retain their
+reasons, and repeated evaluation must produce identical results. Visual review
+evidence is not a production URL blacklist or an automatic image-analysis
+service.
+
+This is a small regression sample, not an accuracy benchmark. Provider metadata
+and playback availability can change; recorded evidence does not establish
+current availability or editorial approval.

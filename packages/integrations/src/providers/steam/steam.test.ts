@@ -495,4 +495,28 @@ describe("optional Steam enrichment", () => {
     ).rejects.toMatchObject({ code: "CANCELLED" });
     expect(fetch).not.toHaveBeenCalled();
   });
+  it("propagates in-flight enrichment cancellation instead of hiding it as an unavailable supplement", async () => {
+    const controller = new AbortController();
+    const logger = { warn: vi.fn() };
+    const fetch = vi.fn<typeof globalThis.fetch>(
+      (_input, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener(
+            "abort",
+            () => reject(new DOMException("cancelled", "AbortError")),
+            { once: true },
+          );
+          controller.abort("private caller context");
+        }),
+    );
+    const original = candidate();
+    const before = structuredClone(original);
+    const adapter = createSteamAdapter({}, { fetch, logger });
+    await expect(
+      adapter.enrichGame(original, { signal: controller.signal }),
+    ).rejects.toMatchObject({ code: "CANCELLED" });
+    expect(original).toEqual(before);
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
 });

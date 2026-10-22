@@ -1,0 +1,43 @@
+enum CatalogueImportType {
+  IMPORT_TITLE
+}
+
+enum CatalogueImportStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+// Execution tracking only: no provider payload, editorial draft or media status.
+model CatalogueImportOperation {
+  id                 String                @id @default(cuid())
+  type               CatalogueImportType   @default(IMPORT_TITLE)
+  status             CatalogueImportStatus @default(PENDING)
+  actorId            String                @map("actor_id")
+  provider           String
+  providerEntity     String                @map("provider_entity")
+  providerExternalId String                @map("provider_external_id")
+  titleType          TitleType             @map("title_type")
+  idempotencyKey     String                @map("idempotency_key") @db.VarChar(128)
+  requestHash        String                @map("request_hash") @db.Char(64)
+  version            Int                   @default(0)
+  attemptCount       Int                   @default(0) @map("attempt_count")
+  startedAt          DateTime?             @map("started_at")
+  completedAt        DateTime?             @map("completed_at")
+  failureCode        String?               @map("failure_code") @db.VarChar(64)
+  failureRetryable   Boolean               @default(false) @map("failure_retryable")
+  resultTitleId      String?               @map("result_title_id")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  updatedAt          DateTime              @updatedAt @map("updated_at")
+  actor              User                  @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  resultTitle        Title?                @relation(fields: [resultTitleId], references: [id], onDelete: Restrict)
+
+  @@unique([actorId, type, idempotencyKey])
+  @@index([provider, providerEntity, providerExternalId])
+  @@index([status, updatedAt])
+  @@index([actorId, createdAt])
+  @@index([resultTitleId])
+  @@map("catalogue_import_operations")
+}

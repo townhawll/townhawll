@@ -531,6 +531,49 @@ describe("TMDB people and supplementary requests", () => {
     );
   });
 
+  it("treats a blank optional season name as absent without losing the series", async () => {
+    const { adapter } = setup(() => ({
+      ...series,
+      seasons: [{ ...series.seasons[1], name: "   \t " }],
+    }));
+    const result = await adapter.getSeries(String(series.id));
+    expect(value(result.seasons)[0]).toMatchObject({
+      seasonNumber: 1,
+      name: null,
+    });
+  });
+
+  it("keeps supplementary issue order independent of concurrent response timing", async () => {
+    vi.useFakeTimers();
+    const fetch = vi.fn<typeof globalThis.fetch>((input) => {
+      const url = new URL(input instanceof Request ? input.url : String(input));
+      if (url.pathname === "/3/movie/254")
+        return Promise.resolve(Response.json(movie));
+      return new Promise((resolve) => {
+        setTimeout(
+          () => resolve(new Response(null, { status: 503 })),
+          url.pathname.endsWith("/1") ? 100 : 1,
+        );
+      });
+    });
+    const adapter = createTmdbAdapter(
+      {
+        accessToken: "fixture-secret",
+        http: { maxAttempts: 1, requestsPerSecond: 100 },
+      },
+      { fetch, now: () => new Date(instant), logger: { warn: vi.fn() } },
+    );
+    const pending = adapter.getMovie("254", { peopleLimit: 2 });
+    await vi.runAllTimersAsync();
+    const result = await pending;
+    expect(
+      result.issues
+        .filter((issue) => issue.section === "person.details")
+        .map((issue) => issue.identity.id),
+    ).toEqual(["1", "2"]);
+    expect(fetch).toHaveBeenCalledTimes(3);
+  });
+
   it("caps person requests at ten and deduplicates repeated person references", async () => {
     vi.useFakeTimers();
     const { adapter, fetch } = setup((url) => {

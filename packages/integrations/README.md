@@ -458,3 +458,73 @@ normalization, text parsing and orchestration are separate modules.
 
 Editorial acceptance/persistence remains separate; this adapter does not write
 Prisma records or merge approved canonical fields.
+
+## Verification and import handoff
+
+`src/verification/provider-flows.test.ts` exercises 14 synthetic provider-flow
+scenarios through mocked native HTTP: popular/older/Indian/anime films,
+ongoing/completed/incomplete series, popular/older/upcoming/DLC-heavy/DLC games,
+an incomplete game and a game with unavailable supplements. It covers
+validation, normalization, recommendations and optional Steam enrichment
+together, checks request counts and verifies contract enums against the
+committed Prisma schema. These fixtures are deliberately synthetic scenarios,
+not live metadata audits. The independent recorded selection replay remains a
+separate visual regression sample. Normal tests require no provider credentials
+or network access.
+
+From the repository root:
+
+```sh
+pnpm --filter @townhawll/integrations test
+pnpm exec turbo run lint typecheck test build --output-logs=errors-only
+pnpm run format:check
+```
+
+An optional live smoke test checks King Kong, Cowboy Bebop, Red Dead Redemption
+2 and Portal 2, including one person per screen title and confirmed Steam
+mappings. It shares adapter instances, allows one HTTP attempt per request, caps
+the entire sample at 12 requests and never writes catalogue data. It needs the
+existing TMDB/IGDB credentials in the root `.env`. Explicitly opt in from
+PowerShell at the repository root:
+
+```powershell
+$env:TOWNHAWLL_PROVIDER_SMOKE = "1"
+pnpm exec node --env-file=.env packages/integrations/node_modules/vitest/vitest.mjs run --root packages/integrations src/verification/provider-live.test.ts
+Remove-Item Env:TOWNHAWLL_PROVIDER_SMOKE
+```
+
+The flag controls tests only; it is not application configuration. Keep live
+checks outside the cached Turbo pipeline. Provider outages or changed metadata
+can fail the opt-in test independently of the offline regression suite.
+
+Consumers must validate the selected candidate and authorize the import on the
+server. Candidates are **not Prisma create inputs**:
+
+- Allocate TownHawll IDs and resolve references through `providerMappingKey`.
+  The entity prefix is required because numeric TMDB movie/series IDs overlap.
+- Persist exact calendar days using date-only database semantics. Year, month
+  and quarter evidence must not be coerced into invented days; retain it in the
+  eventual review/source-evidence workflow. Do not interpret unknown values as
+  explicit clearing instructions on provider refresh.
+- `SCREENSHOT` is an integration source classification, absent from the current
+  persistent `MediaSourceType` enum. Map an accepted screenshot hero explicitly
+  to the existing `BACKDROP` source and `HERO_ART` purpose; retain original
+  source classification in import evidence. Do not pass it directly to Prisma or
+  add a migration merely to persist provider candidates.
+- Resolve taxonomy and related titles before creating joins. Do not create
+  placeholder titles or automatically approve provider taxonomy.
+- Recommendations remain unapproved references. Geometry-only image scores
+  cannot establish semantic scene quality; promotional-composition assessments
+  require actual visual evidence. Verified video metadata/uploader evidence is
+  optional and externally supplied; generic provider labels remain uncertain.
+- Only final accepted selections proceed to secure downloading, processing,
+  upload verification and conditional activation. This package performs none of
+  those operations. Provider attribution/licensing, refresh policy, durable
+  import recovery and deployment-wide throttling remain separate work.
+
+Sources:
+[Catalogue Schema](https://www.notion.so/3f170306b84280138eb8ecf292dade9f),
+[Provider Boundary](https://www.notion.so/3ca70306b84281d08b58e625128ef05d), and
+[Catalogue Media Data Architecture](https://www.notion.so/3fd70306b84281728994e79b4b3552c7).
+The newer schema uses `SERIES`; the older boundary page's `SHOW` terminology
+does not override it.

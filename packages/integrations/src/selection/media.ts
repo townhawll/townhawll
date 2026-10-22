@@ -40,7 +40,7 @@ function manualHeroComposition(signals?: VisualSignals): string | null {
       return null;
   }
 }
-function supportedUrl(candidate: MediaCandidate): boolean {
+export function isSupportedMediaSource(candidate: MediaCandidate): boolean {
   try {
     const url = new URL(candidate.sourceUrl);
     if (url.protocol !== "https:" || url.port || url.username || url.password)
@@ -80,7 +80,7 @@ function eligibility(
     !belongsToTitle(candidate.provenance.identity, context)
   )
     reject("OWNER_MISMATCH", "The image is not mapped to this title.");
-  if (!supportedUrl(candidate))
+  if (!isSupportedMediaSource(candidate))
     reject(
       "UNSUPPORTED_SOURCE_URL",
       "Use a supported provider image origin over HTTPS.",

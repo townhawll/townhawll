@@ -16,6 +16,7 @@
     "@sentry/nextjs": "catalog:",
     "@townhawll/auth": "workspace:*",
     "@townhawll/config": "workspace:*",
+    "@townhawll/content": "workspace:*",
     "@townhawll/observability": "workspace:*",
     "@townhawll/ui": "workspace:*",
     "lucide-react": "catalog:",

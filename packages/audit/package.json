@@ -1,0 +1,33 @@
+{
+  "name": "@townhawll/audit",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/contracts.ts",
+    "./server": {
+      "browser": null,
+      "default": "./src/server.ts"
+    }
+  },
+  "dependencies": {
+    "@townhawll/auth": "workspace:*",
+    "@townhawll/db": "workspace:*",
+    "@townhawll/observability": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@townhawll/eslint-config": "workspace:*",
+    "@townhawll/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

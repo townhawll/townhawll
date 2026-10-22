@@ -13,7 +13,7 @@ import { rankVideoCandidates } from "./videos.js";
 
 export * from "./contracts.js";
 export * from "./evidence.js";
-export { rankMediaCandidates } from "./media.js";
+export { rankMediaCandidates, isSupportedMediaSource } from "./media.js";
 export { rankVideoCandidates, classifyVideoLabel } from "./videos.js";
 export type { SelectionContext } from "./common.js";
 

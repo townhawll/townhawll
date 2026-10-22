@@ -189,9 +189,13 @@ export function createTmdbAdapter(
       assertResponseId(id, raw.id);
       const candidate = normalizeTitle(raw, now().toISOString(), normalization);
       const enriched = await Promise.all(
-        candidate.people
-          .slice(0, values.peopleLimit)
-          .map(async (reference): Promise<PersonCandidate> => {
+        candidate.people.slice(0, values.peopleLimit).map(
+          async (
+            reference,
+          ): Promise<{
+            person: PersonCandidate;
+            issues: TitleDetailsCandidate["issues"];
+          }> => {
             try {
               const result = await fetchPerson(reference.identity.id, {
                 ...(values.language ? { language: values.language } : {}),
@@ -200,13 +204,15 @@ export function createTmdbAdapter(
                   : {}),
                 signal,
               });
-              candidate.issues.push(...result.issues);
               return {
-                ...result.person,
-                media:
-                  result.person.media.state === "known"
-                    ? result.person.media
-                    : reference.media,
+                person: {
+                  ...result.person,
+                  media:
+                    result.person.media.state === "known"
+                      ? result.person.media
+                      : reference.media,
+                },
+                issues: result.issues,
               };
             } catch (error) {
               if (signal.aborted) throw error;
@@ -216,24 +222,31 @@ export function createTmdbAdapter(
                 error.code === "INVALID_REQUEST"
               )
                 throw error;
-              candidate.issues.push({
-                section: "person.details",
-                code: error.code,
-                identity: reference.identity,
-              });
               return {
-                ...reference,
-                detailStatus: "UNAVAILABLE",
-                biography: missing("UNAVAILABLE"),
-                birthday: missing("UNAVAILABLE"),
-                deathday: missing("UNAVAILABLE"),
-                placeOfBirth: missing("UNAVAILABLE"),
+                person: {
+                  ...reference,
+                  detailStatus: "UNAVAILABLE",
+                  biography: missing("UNAVAILABLE"),
+                  birthday: missing("UNAVAILABLE"),
+                  deathday: missing("UNAVAILABLE"),
+                  placeOfBirth: missing("UNAVAILABLE"),
+                },
+                issues: [
+                  {
+                    section: "person.details",
+                    code: error.code,
+                    identity: reference.identity,
+                  },
+                ],
               };
             }
-          }),
+          },
+        ),
       );
+      // Promise.all preserves reference order; network completion order must not reorder diagnostics.
+      candidate.issues.push(...enriched.flatMap((result) => result.issues));
       const enrichedPeople = new Map(
-        enriched.map((person) => [person.identity.id, person]),
+        enriched.map(({ person }) => [person.identity.id, person]),
       );
       candidate.people = candidate.people.map(
         (person) => enrichedPeople.get(person.identity.id) ?? person,

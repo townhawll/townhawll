@@ -54,8 +54,19 @@
       "dependsOn": ["^test"],
       "outputs": []
     },
+    "@townhawll/integrations#test": {
+      "dependsOn": ["^test"],
+      "env": ["TOWNHAWLL_PROVIDER_SMOKE"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/db/prisma/*.prisma"],
+      "outputs": []
+    },
     "@townhawll/db#test": {
       "dependsOn": ["generate"],
+      "cache": false,
+      "outputs": []
+    },
+    "@townhawll/content#test": {
+      "dependsOn": ["^test"],
       "cache": false,
       "outputs": []
     },
